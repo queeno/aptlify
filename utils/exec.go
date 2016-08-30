@@ -2,19 +2,22 @@ package utils
 
 import (
 	"os/exec"
-	"fmt"
-	ctx "github.com/queeno/aptlify/context"
+	"strings"
 )
 
-func Exec (string command) (string, error) {
+func Exec(commandString string) ([]string, error) {
 
-	ctx.Logging.Info.Println(fmt.Sprintf("Running command: %s", command))
+	splitString := strings.Fields(commandString)
+	command := splitString[0]
+	args := splitString[1:len(splitString)]
 
-	out, err := exec.Command(command).Output()
+	out, err := exec.Command(command, args...).Output()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return out, nil
+	arrayOut := strings.Split(string(out), "\n")
+
+	return arrayOut, nil
 
 }
