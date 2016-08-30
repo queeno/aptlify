@@ -12,6 +12,10 @@ func RootCommand() *commander.Command {
 		Short:     "Manage aptly with aptlify",
 		Long: `aptlify manages the publishing of aptly repos and mirrors into a
 unique, simple, configuration-driven tool`,
+		Subcommands: []*commander.Command{
+			makeCmdApply(),
+			makeCmdPlan(),
+		},
 	}
 
 	return cmd
