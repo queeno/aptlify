@@ -11,7 +11,7 @@ func Exec(commandString string) ([]string, error) {
 	command := splitString[0]
 	args := splitString[1:len(splitString)]
 
-	out, err := exec.Command(command, args...).Output()
+	out, err := exec.Command(command, args...).CombinedOutput()
 	if err != nil {
 		return nil, err
 	}

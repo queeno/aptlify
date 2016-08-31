@@ -2,7 +2,7 @@ package context
 
 import (
 	"fmt"
-	"github.com/queeno/aptlify/utils"
+	"github.com/queeno/aptlify/config"
 	"os"
 	"path/filepath"
 )
@@ -31,10 +31,10 @@ func ShutdownContext() error {
 }
 
 // Load configuration and inject it into context
-func (context *AptlifyContext) Config() *utils.ConfigStruct {
+func (context *AptlifyContext) Config() *config.ConfigStruct {
 
 	if context.config_loaded {
-		return &utils.Config
+		return &config.Config
 	}
 
 	var err error
@@ -44,7 +44,7 @@ func (context *AptlifyContext) Config() *utils.ConfigStruct {
 		"/etc/aptlify.conf",
 	}
 	for _, filePath := range filePaths {
-		err = utils.LoadConfig(filePath, &utils.Config)
+		err = config.LoadConfig(filePath, &config.Config)
 		if err == nil {
 			break
 		}
@@ -60,6 +60,6 @@ func (context *AptlifyContext) Config() *utils.ConfigStruct {
 
 	context.config_loaded = true
 
-	return &utils.Config
+	return &config.Config
 
 }
