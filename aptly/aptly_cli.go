@@ -6,8 +6,7 @@ import (
 
 type AptlyCli struct{}
 
-var string aptlyCmd
-var aptlyCmd = "/usr/local/bin/aptly"
+var string aptlyCmd = "/usr/local/bin/aptly"
 
 func (a AptlyCli) Mirror_list() ([]string, error) {
 
@@ -69,8 +68,6 @@ func (a AptlyCli) Mirror_create(AptlyMirrorStruct mirror) error {
 	if mirror.FilterDeps {
 		filter_with_deps_cmd = "-filter-with-deps"
 	}
-
-	args := createStringArray("mirror", "create", filter_cmd, filter_with_deps_cmd, mirror.Name, mirror.Url, mirror.Dist, component)
 
 	cmd := fmt.Sprintf("%s mirror create %s %s %s %s %s %s",
 		aptlyCmd, filter_cmd, filter_with_deps_cmd,

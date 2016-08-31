@@ -13,7 +13,7 @@ func StringToSlice(array ...string) []string {
 	var strings_arr []string
 
 	for _, e := range array {
-		if ! isStringEmpty(e) {
+		if ! IsStringEmpty(e) {
 			strings_arr = append(strings_arr, e)
 		}
 	}
