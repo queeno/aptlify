@@ -16,7 +16,7 @@ func Exec(commandString string) ([]string, error) {
 		return nil, err
 	}
 
-	arrayOut := strings.Split(string(out), "\n")
+	arrayOut := SplitStringToSlice(string(out))
 
 	return arrayOut, nil
 

@@ -15,6 +15,7 @@ unique, simple, configuration-driven tool`,
 		Subcommands: []*commander.Command{
 			makeCmdApply(),
 			makeCmdPlan(),
+			makeCmdDump(),
 		},
 	}
 

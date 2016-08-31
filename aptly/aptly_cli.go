@@ -2,60 +2,62 @@ package aptly
 
 import (
 	"github.com/queeno/aptlify/utils"
+	"github.com/queeno/aptlify/config"
+	"fmt"
+	"strings"
+)
+
+// Check interface
+var (
+	_ Aptly = &AptlyCli{}
 )
 
 type AptlyCli struct{}
 
-var string aptlyCmd = "/usr/local/bin/aptly"
+var aptlyCmd string = "/usr/local/bin/aptly"
 
-func (a AptlyCli) Mirror_list() ([]string, error) {
+func (a *AptlyCli) Mirror_list() ([]string, error) {
 
-	cmd := fmt.Sprintf("%s mirror list", aptlyCmd)
+	cmd := fmt.Sprintf("%s mirror list -raw", aptlyCmd)
 
-	out, err := utils.Exec(cmd)
+	mirrors, err := utils.Exec(cmd)
 	if err != nil {
 		return nil, err
 	}
-
-	mirrors := utils.SplitStringToSlice(out)
-
-	return mirrors
+	return mirrors, nil
 }
 
-func (a AptlyCli) Mirror_update(string mirrorName) error {
+func (a *AptlyCli) Mirror_update(mirrorName string) ([]string, error) {
 	cmd := fmt.Sprintf("%s mirror update %s", aptlyCmd, mirrorName)
 	out, err := utils.Exec(cmd)
-	if err != nil {
-		return err
-	}
-	return nil
+	return out, err
 }
 
 // mirror_create: IN: name, url, dist, components, filters, filter-with-deps, OUT: error
-func (a AptlyCli) Mirror_create(AptlyMirrorStruct mirror) error {
+func (a *AptlyCli) Mirror_create(mirror config.AptlyMirrorStruct) ([]string, error) {
 
 	filter_with_deps_cmd := ""
 	filter_cmd := ""
 
-	if isEmpty(mirror.Name) {
+	if utils.IsStringEmpty(mirror.Name) {
 		return nil, fmt.Errorf("Missing name from mirror")
 	}
-	if isEmpty(mirror.Url) {
+	if utils.IsStringEmpty(mirror.Url) {
 		return nil, fmt.Errorf("Missing url from mirror")
 	}
-	if isEmpty(mirror.Dist) {
+	if utils.IsStringEmpty(mirror.Dist) {
 		return nil, fmt.Errorf("Missing distribution from mirror")
 	}
 
 	component := mirror.Component
-	if isEmpty(component) {
+	if utils.IsStringEmpty(component) {
 		component = ""
 	}
 
 	if mirror.Filter != nil {
 		var filter_cmds []string
 		for _, filter := range mirror.Filter {
-			filter_cmds = append(filter_cmds, filter.createAptlyMirrorFilter())
+			filter_cmds = append(filter_cmds, createAptlyMirrorFilterCommand(filter))
 		}
 
 		if len(filter_cmds) > 1 {
@@ -72,20 +74,48 @@ func (a AptlyCli) Mirror_create(AptlyMirrorStruct mirror) error {
 	cmd := fmt.Sprintf("%s mirror create %s %s %s %s %s %s",
 		aptlyCmd, filter_cmd, filter_with_deps_cmd,
 		mirror.Name, mirror.Url, mirror.Dist, component)
+
 	out, err := utils.Exec(cmd)
-	if err != nil {
-		return err
-	}
-	return nil
+	return out, err
 }
 
-func (a AptlyCli) Repo_list() ([]string, error) {
-	cmd := fmt.Sprintf("%s repo list", aptlyCmd)
+func (a *AptlyCli) Repo_list() ([]string, error) {
+	cmd := fmt.Sprintf("%s repo list -raw", aptlyCmd)
 
-	out, err := utils.Exec(cmd)
-	if err != nil {
-		return nil, err
+	repos, err := utils.Exec(cmd)
+	return repos, err
+}
+
+func (a *AptlyCli) Repo_add(repoName string) ([]string, error) {
+	cmd := fmt.Sprintf("%s repo add %s", aptlyCmd, repoName)
+
+	repos, err := utils.Exec(cmd)
+	return repos, err
+}
+
+
+
+/* Supporting functions */
+
+func createAptlyMirrorFilterCommand(filter config.AptlyFilterStruct) string {
+
+	var f []string
+	if !utils.IsStringEmpty(filter.Name) {
+		f = append(f, fmt.Sprintf("Name (= %s)", filter.Name))
 	}
-	repos := utils.SplitStringToSlice(out)
-	return repos
+
+	if !utils.IsStringEmpty(filter.Version) {
+		f = append(f, fmt.Sprintf("$Version (= %s)", filter.Version))
+	}
+
+	f_str := ""
+
+	if len(f) > 1 {
+		f_str = fmt.Sprintf("( %s )", strings.Join(f, " , "))
+	} else if len(f) == 1 {
+		f_str = fmt.Sprintf("( %s )", f[0])
+	}
+
+	return f_str
+
 }
