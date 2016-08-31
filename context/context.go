@@ -40,8 +40,8 @@ func (context *AptlifyContext) Config() *utils.ConfigStruct {
 	var err error
 
 	filePaths := []string{
-		filepath.Join(os.Getenv("HOME"), ".go-deploy.conf"),
-		"/etc/go-deploy.conf",
+		filepath.Join(os.Getenv("HOME"), ".aptlify.conf"),
+		"/etc/aptlify.conf",
 	}
 	for _, filePath := range filePaths {
 		err = utils.LoadConfig(filePath, &utils.Config)

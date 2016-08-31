@@ -5,15 +5,27 @@ import (
   "encoding/json"
 )
 
-type ConfigStruct struct {
-  captain_host  string    `json:captain_host`
-  docktor_host  string    `json:docktor_host`
+type AptlyFilterStruct struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
-var Config = ConfigStruct {
-  captain_host: "",
-  docktor_host: "",
+type AptlyMirrorStruct struct {
+	Name       string              `json:"name"`
+	Gpg        []string            `json:"gpg"`
+	Url        string              `json:"url"`
+	Dist       string              `json:"dist"`
+	Component  string              `json:"component"`
+	Filter     []AptlyFilterStruct `json:"filter"`
+	FilterDeps bool                `json:"filter-with-deps"`
 }
+
+type ConfigStruct struct {
+	Mirrors []AptlyMirrorStruct		`json:"mirrors"`
+	Repos   []string							`json:"repos"`
+}
+
+var Config ConfigStruct
 
 // Open configuration file and decode the JSON
 func LoadConfig(filename string, config *ConfigStruct) error {
@@ -28,7 +40,7 @@ func LoadConfig(filename string, config *ConfigStruct) error {
 
   dec := json.NewDecoder(f)
 
-  err = dec.Decode(Config)
+  err = dec.Decode(config)
   if err != nil {
     return err
   }
