@@ -1,9 +1,9 @@
 package aptly
 
 import (
-	"github.com/queeno/aptlify/utils"
-	"github.com/queeno/aptlify/config"
 	"fmt"
+	"github.com/queeno/aptlify/config"
+	"github.com/queeno/aptlify/utils"
 	"strings"
 )
 
@@ -14,7 +14,7 @@ var (
 
 type AptlyCli struct{}
 
-var aptlyCmd string = "/usr/local/bin/aptly"
+var aptlyCmd string = "/usr/bin/aptly"
 
 func (a *AptlyCli) Mirror_list() ([]string, error) {
 
@@ -92,8 +92,6 @@ func (a *AptlyCli) Repo_add(repoName string) ([]string, error) {
 	repos, err := utils.Exec(cmd)
 	return repos, err
 }
-
-
 
 /* Supporting functions */
 
