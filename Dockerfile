@@ -18,11 +18,9 @@ ENV PATH /root/gowork/bin:/usr/bin:/usr/local/bin:/bin:/sbin:/usr/sbin
 COPY . /root/gowork/src/github.com/queeno/aptlify
 
 RUN cd /root/gowork/src/github.com/queeno/aptlify && \
+  rm -rf /root/gowork/src/github.com/queeno/aptlify/vendor && \
   gom install && \
   gom build -o /bin/aptlify main.go
-
-RUN aptly repo create simon && \
-  aptly repo create philip
 
 RUN /aptlify/run_tests.sh
 
