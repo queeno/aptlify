@@ -33,7 +33,7 @@ func (a *AptlyCli) Mirror_update(mirrorName string) ([]string, error) {
 	return out, err
 }
 
-// mirror_create: IN: name, url, dist, components, filters, filter-with-deps, OUT: error
+// mirror_create: IN: mirror AptlyMirrorStruct, OUT: []string, error
 func (a *AptlyCli) Mirror_create(mirror config.AptlyMirrorStruct) ([]string, error) {
 
 	filter_with_deps_cmd := ""
