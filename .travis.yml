@@ -1,6 +1,13 @@
 language: go
 go:
         - 1.6.3
-        - 1.7.0
+        - tip
+sudo:   required
+before_script:
+        - echo "deb http://repo.aptly.info/ squeeze main" | sudo tee -a /etc/apt/sources.list.d/aptly.list
+        - sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 9E3E53F19C7DE460
+        - sudo apt-get update -qq
+        - sudo apt-get install -y aptly
+
 script:
         - ./run_tests.sh
