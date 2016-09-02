@@ -27,3 +27,4 @@ drop_repos
 
 go test -v github.com/queeno/aptlify/utils -check.v
 go test -v github.com/queeno/aptlify/aptly -check.v
+go test -v github.com/queeno/aptlify/gpg -check.v
