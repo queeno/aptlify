@@ -1,8 +1,8 @@
 package config
 
 import (
-  "os"
-  "encoding/json"
+	"encoding/json"
+	"os"
 )
 
 type AptlyFilterStruct struct {
@@ -21,8 +21,8 @@ type AptlyMirrorStruct struct {
 }
 
 type ConfigStruct struct {
-	Mirrors []AptlyMirrorStruct		`json:"mirrors"`
-	Repos   []string							`json:"repos"`
+	Mirrors []AptlyMirrorStruct `json:"mirrors"`
+	Repos   []string            `json:"repos"`
 }
 
 var Config ConfigStruct
@@ -30,21 +30,21 @@ var Config ConfigStruct
 // Open configuration file and decode the JSON
 func LoadConfig(filename string, config *ConfigStruct) error {
 
-  f, err := os.Open(filename)
+	f, err := os.Open(filename)
 
-  if err != nil {
-    return err
-  }
+	if err != nil {
+		return err
+	}
 
-  defer f.Close()
+	defer f.Close()
 
-  dec := json.NewDecoder(f)
+	dec := json.NewDecoder(f)
 
-  err = dec.Decode(config)
-  if err != nil {
-    return err
-  }
+	err = dec.Decode(config)
+	if err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 
 }

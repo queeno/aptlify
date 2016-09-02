@@ -2,7 +2,6 @@ package mirror
 
 import (
 	"fmt"
-
 )
 
 func mirrorExists(mirror_name string) bool {
@@ -184,11 +183,11 @@ func aptlyRunSetup(cmd *commander.Command, args []string) error {
 
 	var commands [][]string
 
-	if repoCommands != nil  {
+	if repoCommands != nil {
 		for _, cmd := range repoCommands {
 			commands = append(commands, cmd)
 		}
-  }
+	}
 
 	if mirrorCommands != nil {
 		for _, cmd := range mirrorCommands {
@@ -203,14 +202,6 @@ func aptlyRunSetup(cmd *commander.Command, args []string) error {
 	return err
 }
 
-
-
-
-
-
-
-
 func Plan() error {
-
 
 }

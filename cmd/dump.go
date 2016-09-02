@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/gonuts/commander"
 	"github.com/queeno/aptlify/aptly"
-	"github.com/queeno/aptlify/utils"
 	ctx "github.com/queeno/aptlify/context"
-	"fmt"
+	"github.com/queeno/aptlify/utils"
 )
 
 func dump(cmd *commander.Command, args []string) error {
@@ -34,7 +34,6 @@ func dump(cmd *commander.Command, args []string) error {
 
 	return nil
 }
-
 
 func makeCmdDump() *commander.Command {
 	cmd := &commander.Command{

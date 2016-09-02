@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/gonuts/commander"
 	"fmt"
+	"github.com/gonuts/commander"
 )
 
 func plan(cmd *commander.Command, args []string) error {

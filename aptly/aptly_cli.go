@@ -14,7 +14,7 @@ var (
 
 type AptlyCli struct{}
 
-var aptlyCmd string = "/usr/bin/aptly"
+var aptlyCmd string = "aptly"
 
 func (a *AptlyCli) Mirror_list() ([]string, error) {
 

@@ -5,19 +5,11 @@ import (
 )
 
 func SplitStringToSlice(s string) []string {
-  return strings.Split(s, "\n")
-}
-
-func StringToSlice(array ...string) []string {
-
-	var strings_arr []string
-
-	for _, e := range array {
-		if ! IsStringEmpty(e) {
-			strings_arr = append(strings_arr, e)
-		}
+	rStr := strings.Split(s, "\n")
+	if rStr[len(rStr)-1] == "" {
+		rStr = rStr[:len(rStr)-1]
 	}
-	return strings_arr
+	return rStr
 }
 
 func IsStringEmpty(element string) bool {

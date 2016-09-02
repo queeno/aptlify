@@ -9,7 +9,7 @@ func Exec(commandString string) ([]string, error) {
 
 	splitString := strings.Fields(commandString)
 	command := splitString[0]
-	args := splitString[1:len(splitString)]
+	args := splitString[1:]
 
 	out, err := exec.Command(command, args...).CombinedOutput()
 	if err != nil {
