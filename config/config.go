@@ -10,6 +10,10 @@ type AptlyFilterStruct struct {
 	Version string `json:"version"`
 }
 
+func (a AptlyFilterStruct) Equals(b AptlyFilterStruct) bool {
+	return (a.Name == b.Name) && (a.Version == b.Version)
+}
+
 type AptlyMirrorStruct struct {
 	Name       string              `json:"name"`
 	Gpg        []string            `json:"gpg"`
