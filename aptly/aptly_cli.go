@@ -2,7 +2,7 @@ package aptly
 
 import (
 	"fmt"
-	"github.com/queeno/aptlify/config"
+	"github.com/queeno/aptlify/mirror"
 	"github.com/queeno/aptlify/utils"
 	"strings"
 )
@@ -34,7 +34,7 @@ func (a *AptlyCli) Mirror_update(mirrorName string) ([]string, error) {
 }
 
 // mirror_create: IN: mirror AptlyMirrorStruct, OUT: []string, error
-func (a *AptlyCli) Mirror_create(mirror config.AptlyMirrorStruct) ([]string, error) {
+func (a *AptlyCli) Mirror_create(mirror mirror.AptlyMirrorStruct) ([]string, error) {
 
 	filter_with_deps_cmd := ""
 	filter_cmd := ""
@@ -95,7 +95,7 @@ func (a *AptlyCli) Repo_add(repoName string) ([]string, error) {
 
 /* Supporting functions */
 
-func createAptlyMirrorFilterCommand(filter config.AptlyFilterStruct) string {
+func createAptlyMirrorFilterCommand(filter mirror.AptlyFilterStruct) string {
 
 	var f []string
 	if !utils.IsStringEmpty(filter.Name) {

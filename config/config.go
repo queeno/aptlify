@@ -1,35 +1,21 @@
 package config
 
 import (
+	"github.com/queeno/aptlify/mirror"
+	"github.com/queeno/aptlify/repo"
+	"github.com/queeno/aptlify/gpg"
 	"encoding/json"
 	"os"
 )
 
-type AptlyFilterStruct struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
-}
-
-func (a AptlyFilterStruct) Equals(b AptlyFilterStruct) bool {
-	return (a.Name == b.Name) && (a.Version == b.Version)
-}
-
-type AptlyMirrorStruct struct {
-	Name       string              `json:"name"`
-	Gpg        []string            `json:"gpg"`
-	Url        string              `json:"url"`
-	Dist       string              `json:"dist"`
-	Component  string              `json:"component"`
-	Filter     []AptlyFilterStruct `json:"filter"`
-	FilterDeps bool                `json:"filter-with-deps"`
-}
-
 type ConfigStruct struct {
-	Mirrors []AptlyMirrorStruct `json:"mirrors"`
-	Repos   []string            `json:"repos"`
+	Mirrors 	[]mirror.AptlyMirrorStruct	`json:"mirrors"`
+	Repos   	[]repo.AptlyRepoStruct			`json:"repos"`
+	Gpg_keys	gpg.AptlyGpgStruct					`json:"gpg_keys"`
 }
 
-var Config ConfigStruct
+var Config ConfigStruct = ConfigStruct{}
+var State ConfigStruct = ConfigStruct{}
 
 // Open configuration file and decode the JSON
 func LoadConfig(filename string, config *ConfigStruct) error {
@@ -50,5 +36,25 @@ func LoadConfig(filename string, config *ConfigStruct) error {
 	}
 
 	return nil
+
+}
+
+func WriteConfig(filename string, config ConfigStruct) error {
+
+	f, err := os.Open(filename)
+
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	encoded, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(encoded)
+
+	return err
 
 }

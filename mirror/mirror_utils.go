@@ -1,11 +1,8 @@
-package utils
+package mirror
 
-/*import (
-)
-
-func uniqueFiltersOnLeft(filts1 []config.AptlyFilterStruct, filts2 []config.AptlyFilterStruct) ([]config.AptlyFilterStruct, error) {
+func uniqueFiltersOnLeft(filts1 []AptlyFilterStruct, filts2 []AptlyFilterStruct) ([]AptlyFilterStruct, error) {
 	var thisOneFound bool
-	var newFilters []config.AptlyFilterStruct
+	var newFilters []AptlyFilterStruct
 	for _, f1 := range filts1 {
 		thisOneFound = false
 		for _, f2 := range filts2 {
@@ -20,9 +17,9 @@ func uniqueFiltersOnLeft(filts1 []config.AptlyFilterStruct, filts2 []config.Aptl
 	return newFilters, nil
 }
 
-func DiffFilterSlices(filts1 []config.AptlyFilterStruct, filts2 []config.AptlyFilterStruct) ([]config.AptlyFilterStruct, []config.AptlyFilterStruct, error) {
-	var newFilters1 []config.AptlyFilterStruct
-	var newFilters2 []config.AptlyFilterStruct
+func diffFilterSlices(filts1 []AptlyFilterStruct, filts2 []AptlyFilterStruct) ([]AptlyFilterStruct, []AptlyFilterStruct, error) {
+	var newFilters1 []AptlyFilterStruct
+	var newFilters2 []AptlyFilterStruct
 	var err error
 	if newFilters1, err = uniqueFiltersOnLeft(filts1, filts2); err != nil {
 		return nil, nil, err
@@ -31,4 +28,4 @@ func DiffFilterSlices(filts1 []config.AptlyFilterStruct, filts2 []config.AptlyFi
 		return nil, nil, err
 	}
 	return newFilters1, newFilters2, nil
-}*/
+}

@@ -3,7 +3,6 @@ package gpg
 import (
 	"errors"
 	"fmt"
-	ctx "github.com/queeno/aptlify/context"
 	"github.com/queeno/aptlify/utils"
 	"strings"
 )
@@ -23,7 +22,7 @@ func extractFingerprints(output []string) ([]string, error) {
 
 func keyLoaded(keyFingerprint string) bool {
 
-	ctx.Logging.Info.Println(fmt.Sprintf("Can we find %s", keyFingerprint))
+	//ctx.Logging.Info.Println(fmt.Sprintf("Can we find %s", keyFingerprint))
 	fingerprintArray, _ := utils.Exec("apt-key finger --with-colons")
 	extractedFingerprints, _ := extractFingerprints(fingerprintArray)
 	fmt.Println(extractedFingerprints)

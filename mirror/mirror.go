@@ -1,10 +1,87 @@
 package mirror
 
 import (
-	"fmt"
+	"github.com/queeno/aptlify/action"
 )
 
-func mirrorExists(mirror_name string) bool {
+type AptlyFilterStruct struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+}
+
+func (a AptlyFilterStruct) Equals(b AptlyFilterStruct) bool {
+	return (a.Name == b.Name) && (a.Version == b.Version)
+}
+
+
+type AptlyMirrorStruct struct {
+	Name       string              `json:"name"`
+	Url        string              `json:"url"`
+	Dist       string              `json:"dist"`
+	Component  string              `json:"component"`
+	Filter     []AptlyFilterStruct `json:"filter"`
+	FilterDeps bool                `json:"filter-with-deps"`
+}
+
+
+func SearchMirrorInAptlyMirrors(thisMirror AptlyMirrorStruct, Mirrors []AptlyMirrorStruct) AptlyMirrorStruct {
+
+	for _, mirror := range Mirrors {
+			if mirror.Name == thisMirror.Name {
+				return mirror
+			}
+	}
+
+	return AptlyMirrorStruct{}
+}
+
+func CreateMirrorActions(configMirrors []AptlyMirrorStruct, stateMirrors []AptlyMirrorStruct) []action.ActionStruct {
+
+	var actions = []action.ActionStruct{}
+
+	for _, configMirror := range configMirrors {
+		actions = append(actions, configMirror.Compare(SearchMirrorInAptlyMirrors(configMirror, stateMirrors)))
+	}
+
+	return actions
+
+}
+
+func (a AptlyMirrorStruct) Compare (b AptlyMirrorStruct) action.ActionStruct {
+
+	var ac = action.ActionStruct{ResourceName: a.Name, ChangeType: action.Noop }
+
+	if a.Url != b.Url {
+		ac.ChangeType = action.Mirror_recreate
+		ac.AddReasonToAction("url")
+	}
+
+	if a.Dist != b.Dist {
+		ac.ChangeType = action.Mirror_recreate
+		ac.AddReasonToAction("distribution")
+	}
+
+	if a.Component != b.Component {
+		ac.ChangeType = action.Mirror_recreate
+		ac.AddReasonToAction("component")
+	}
+
+	if a.FilterDeps != b.FilterDeps {
+		ac.ChangeType = action.Mirror_recreate
+		ac.AddReasonToAction("filter-deps")
+	}
+
+	if diff, _, _ := diffFilterSlices(a.Filter, b.Filter); diff != nil {
+		ac.ChangeType = action.Mirror_recreate
+		ac.AddReasonToAction("filter")
+	}
+
+	return ac
+
+}
+
+
+/*func mirrorExists(mirror_name string) bool {
 	mirror, _ := context.CollectionFactory().RemoteRepoCollection().ByName(mirror_name)
 
 	if mirror == nil {
@@ -202,6 +279,23 @@ func aptlyRunSetup(cmd *commander.Command, args []string) error {
 	return err
 }
 
-func Plan() error {
+func RetrieveState(conf_mirrors []AptlyMirrorStruct) error {
 
+ctx.Logging.Info.Println("retrieving mirror information from aptly")
+
+a := &aptly.AptlyCli{}
+
+if aptly_mirrors, err := a.Mirror_list(); err != nil {
+	return err
 }
+
+ctx.Logging.Info.Println("retrieving aptlify mirror configuration")
+conf_mirrors := context.Config().Mirrors
+
+for _, mirror := range conf_mirrors {
+		if isMirrorInAptly(mirror, aptly_mirrors) {
+
+		}
+}
+
+}*/

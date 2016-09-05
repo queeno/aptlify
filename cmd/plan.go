@@ -1,22 +1,36 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/gonuts/commander"
+	"github.com/queeno/aptlify/mirror"
+	"github.com/queeno/aptlify/repo"
+	"github.com/queeno/aptlify/gpg"
+	"github.com/queeno/aptlify/action"
 )
 
-func plan(cmd *commander.Command, args []string) error {
-	//var err error
-	//err = gpg.Plan()
-	//if err != nil {
-	//	return err
-	//}
-	// err = publish.Plan()
-	// if err != nil {
-	//    return err
-	//}
 
-	fmt.Println(context.Config())
+
+func createActions() []action.ActionStruct {
+
+	config := context.Config()
+	state := context.State()
+
+	mirrorActions := mirror.CreateMirrorActions(config.Mirrors, state.Mirrors)
+	repoActions := repo.CreateRepoActions(config.Repos, state.Repos)
+	gpgActions := gpg.CreateGpgActions(config.Gpg_keys, state.Gpg_keys)
+
+	return append(append(mirrorActions, repoActions...), gpgActions...)
+}
+
+func plan(cmd *commander.Command, args []string) error {
+
+	// Create changes
+
+	actions := createActions()
+
+	for _, action := range actions {
+		action.Plan()
+	}
 
 	return nil
 }
