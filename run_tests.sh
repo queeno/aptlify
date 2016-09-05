@@ -25,6 +25,10 @@ create_repos
 aptlify dump
 drop_repos
 
+cd /aptlify
+rm -rf ./vendor
+gom -test install
+
 go test -v github.com/queeno/aptlify/utils -check.v
 go test -v github.com/queeno/aptlify/aptly -check.v
 go test -v github.com/queeno/aptlify/gpg -check.v
