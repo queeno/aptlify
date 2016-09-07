@@ -18,9 +18,7 @@ var aptlyCmd string = "aptly"
 
 func (a *AptlyCli) Mirror_list() ([]string, error) {
 
-	cmd := fmt.Sprintf("%s mirror list -raw", aptlyCmd)
-
-	mirrors, err := utils.Exec(cmd)
+	mirrors, err := utils.Exec(aptlyCmd, "mirror", "list", "-raw")
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +26,7 @@ func (a *AptlyCli) Mirror_list() ([]string, error) {
 }
 
 func (a *AptlyCli) Mirror_update(mirrorName string) ([]string, error) {
-	cmd := fmt.Sprintf("%s mirror update %s", aptlyCmd, mirrorName)
-	out, err := utils.Exec(cmd)
+	out, err := utils.Exec(aptlyCmd, "mirror", "update", mirrorName)
 	return out, err
 }
 
@@ -61,9 +58,9 @@ func (a *AptlyCli) Mirror_create(mirror mirror.AptlyMirrorStruct) ([]string, err
 		}
 
 		if len(filter_cmds) > 1 {
-			filter_cmd = fmt.Sprintf("-filter=%s", strings.Join(filter_cmds, " | "))
+			filter_cmd = fmt.Sprintf("-filter='%s'", strings.Join(filter_cmds, " | "))
 		} else if len(filter_cmds) == 1 {
-			filter_cmd = fmt.Sprintf("-filter=%s", filter_cmds[0])
+			filter_cmd = fmt.Sprintf("-filter='%s'", filter_cmds[0])
 		}
 	}
 
@@ -71,26 +68,24 @@ func (a *AptlyCli) Mirror_create(mirror mirror.AptlyMirrorStruct) ([]string, err
 		filter_with_deps_cmd = "-filter-with-deps"
 	}
 
-	cmd := fmt.Sprintf("%s mirror create %s %s %s %s %s %s",
-		aptlyCmd, filter_cmd, filter_with_deps_cmd,
-		mirror.Name, mirror.Url, mirror.Dist, component)
+	out, err := utils.Exec(aptlyCmd, "mirror", "create", filter_cmd, filter_with_deps_cmd, mirror.Name, mirror.Url, mirror.Dist, component)
 
-	out, err := utils.Exec(cmd)
 	return out, err
 }
 
 func (a *AptlyCli) Repo_list() ([]string, error) {
-	cmd := fmt.Sprintf("%s repo list -raw", aptlyCmd)
-
-	repos, err := utils.Exec(cmd)
+	repos, err := utils.Exec(aptlyCmd, "repo", "list", "-raw")
 	return repos, err
 }
 
-func (a *AptlyCli) Repo_add(repoName string) ([]string, error) {
-	cmd := fmt.Sprintf("%s repo add %s", aptlyCmd, repoName)
+func (a *AptlyCli) Mirror_drop(mirrorName string) ([]string, error) {
+	out, err := utils.Exec(aptlyCmd, "mirror", "drop", mirrorName)
+	return out, err
+}
 
-	repos, err := utils.Exec(cmd)
-	return repos, err
+func (a *AptlyCli) Repo_create(repoName string) ([]string, error) {
+	out, err := utils.Exec(aptlyCmd, "repo", "create", repoName)
+	return out, err
 }
 
 /* Supporting functions */

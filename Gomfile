@@ -1,4 +1,5 @@
 gom 'github.com/gonuts/commander', :commit => 'f8ba4e959ca914268227c3ebbd7f6bf0bb35541a'
+gom 'github.com/fatih/color', :commit => '87d4004f2ab62d0d255e0a38f1680aa534549fe3'
 
 group :test do
   gom 'gopkg.in/check.v1'

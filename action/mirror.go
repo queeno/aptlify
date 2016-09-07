@@ -20,6 +20,12 @@ func compareMirrors (a mirror.AptlyMirrorStruct, b mirror.AptlyMirrorStruct) Act
 
 	var ac = ActionStruct{ResourceName: a.Name, ChangeType: Noop }
 
+	if b.IsEmpty() {
+		ac.ChangeType = Mirror_create
+		ac.AddReasonToAction("new_mirror")
+		return ac
+	}
+
 	if a.Url != b.Url {
 		ac.ChangeType = Mirror_recreate
 		ac.AddReasonToAction("url")

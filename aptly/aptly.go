@@ -14,5 +14,5 @@ type Aptly interface {
 	// repo_list: IN: n/a OUT: repo-list, error
 	Repo_list() ([]string, error)
 	// repo_add: IN: repo-name, OUT: error
-	Repo_add(string) ([]string, error)
+	Repo_create(string) ([]string, error)
 }

@@ -31,6 +31,12 @@ func (thisMirror AptlyMirrorStruct) SearchMirrorInAptlyMirrors(Mirrors []AptlyMi
 	return AptlyMirrorStruct{}
 }
 
+func (a AptlyMirrorStruct) IsEmpty() bool {
+	if a.Name == "" {
+		return true
+	}
+	return false
+}
 
 /*func mirrorExists(mirror_name string) bool {
 	mirror, _ := context.CollectionFactory().RemoteRepoCollection().ByName(mirror_name)
