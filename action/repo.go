@@ -19,10 +19,11 @@ func createRepoActions(configRepos []repo.AptlyRepoStruct, stateRepos []repo.Apt
 
 func compareRepos (a repo.AptlyRepoStruct, b repo.AptlyRepoStruct) ActionStruct {
 
-	var ac = ActionStruct{ResourceName: a.Name, ChangeType: Noop }
+	var ac = ActionStruct{ResourceName: a.Name, ChangeType: Noop, ResourceType: repoType }
 
 	if a.Name != b.Name {
 		ac.ChangeType = Repo_create
+		ac.ResourceType = repoType
 		ac.AddReasonToAction("new repo")
 	}
 

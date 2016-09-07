@@ -18,13 +18,14 @@ func createGpgActions(configGpgs gpg.AptlyGpgStruct, stateGpgs gpg.AptlyGpgStruc
 
 func compareGpg (a gpg.AptlyGpgStruct, b string) ActionStruct {
 
-	var ac = ActionStruct{ResourceName: b, ChangeType: Gpg_add }
+	var ac = ActionStruct{ResourceName: b, ChangeType: Gpg_add, ResourceType: gpgType }
 	ac.AddReasonToAction("GPG key not found")
 
 
 	for _, gpg := range a.Fingerprint {
 		if gpg == b {
 			ac.ResourceName = b
+			ac.ResourceType = gpgType
 			ac.ChangeType = Noop
 			ac.AddReasonToAction("")
 		}

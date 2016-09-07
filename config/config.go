@@ -17,6 +17,34 @@ type ConfigStruct struct {
 var Config ConfigStruct = ConfigStruct{}
 var State ConfigStruct = ConfigStruct{}
 
+func (c *ConfigStruct) AddMirror(m mirror.AptlyMirrorStruct) {
+
+	if m.IsEmpty() {
+		return
+	}
+
+	c.Mirrors = append(c.Mirrors, m)
+}
+
+func (c *ConfigStruct) AddRepo(r repo.AptlyRepoStruct) {
+
+	if r.IsEmpty() {
+		return
+	}
+
+	c.Repos = append(c.Repos, r)
+}
+
+
+func (c *ConfigStruct) AddGpg(g string) {
+
+	if g == "" {
+		return
+	}
+
+	c.Gpg_keys.Fingerprint = append(c.Gpg_keys.Fingerprint, g)
+}
+
 // Open configuration file and decode the JSON
 func LoadConfig(filename string, config *ConfigStruct) error {
 
@@ -41,8 +69,7 @@ func LoadConfig(filename string, config *ConfigStruct) error {
 
 func WriteConfig(filename string, config ConfigStruct) error {
 
-	f, err := os.Open(filename)
-
+	f, err := os.Create(filename)
 	if err != nil {
 		return err
 	}

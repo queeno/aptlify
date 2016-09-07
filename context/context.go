@@ -33,6 +33,24 @@ func ShutdownContext() error {
 	return nil
 }
 
+func (context *AptlifyContext) WriteState(state config.ConfigStruct) {
+
+	var err error
+
+	filePath, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	filePath = filepath.Join(filePath, "aptlify.state")
+	if err != nil {
+		Logging.Fatal.Fatalf(fmt.Sprintf("error loading current path: %s, %s", filePath, err))
+	}
+
+	err = config.WriteConfig(filePath, state)
+
+	if err != nil {
+		Logging.Fatal.Fatalf(fmt.Sprintf("error writing state file %s, %s", filePath, err))
+	}
+
+}
+
 func (context *AptlifyContext) State() *config.ConfigStruct {
 
 	if context.state_loaded {
@@ -48,10 +66,7 @@ func (context *AptlifyContext) State() *config.ConfigStruct {
 	}
 
 	err = config.LoadConfig(filePath, &config.State)
-	if os.IsNotExist(err) {
-		Logging.Warning.Println(fmt.Sprintf("state file does not exist %s: %s", filePath, err))
-		config.WriteConfig(filePath, config.State)
-	} else if err != nil {
+	if err != nil && !os.IsNotExist(err) {
 		Logging.Fatal.Fatalf(fmt.Sprintf("error loading state file %s, %s", filePath, err))
 	}
 

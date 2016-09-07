@@ -18,32 +18,33 @@ func createMirrorActions(configMirrors []mirror.AptlyMirrorStruct, stateMirrors 
 
 func compareMirrors (a mirror.AptlyMirrorStruct, b mirror.AptlyMirrorStruct) ActionStruct {
 
-	var ac = ActionStruct{ResourceName: a.Name, ChangeType: Noop }
+	var ac = ActionStruct{ResourceName: a.Name, ChangeType: Noop, ResourceType: mirrorType }
 
 	if b.IsEmpty() {
 		ac.ChangeType = Mirror_create
 		ac.AddReasonToAction("new_mirror")
+		ac.ResourceType = mirrorType
 		return ac
 	}
 
 	if a.Url != b.Url {
-		ac.ChangeType = Mirror_recreate
 		ac.AddReasonToAction("url")
+		ac.ChangeType = Mirror_recreate
 	}
 
 	if a.Dist != b.Dist {
-		ac.ChangeType = Mirror_recreate
 		ac.AddReasonToAction("distribution")
+		ac.ChangeType = Mirror_recreate
 	}
 
 	if a.Component != b.Component {
-		ac.ChangeType = Mirror_recreate
 		ac.AddReasonToAction("component")
+		ac.ChangeType = Mirror_recreate
 	}
 
 	if a.FilterDeps != b.FilterDeps {
-		ac.ChangeType = Mirror_recreate
 		ac.AddReasonToAction("filter-deps")
+		ac.ChangeType = Mirror_recreate
 	}
 
 	if diff, _, _ := mirror.DiffFilterSlices(a.Filter, b.Filter); diff != nil {
@@ -51,6 +52,7 @@ func compareMirrors (a mirror.AptlyMirrorStruct, b mirror.AptlyMirrorStruct) Act
 		ac.AddReasonToAction("filter")
 	}
 
+	ac.ResourceType = mirrorType
 	return ac
 
 }

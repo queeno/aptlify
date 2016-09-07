@@ -12,13 +12,14 @@ import (
 )
 
 type ActionStruct struct {
-	ResourceName	string
+	ResourceName string
+	ResourceType int
 	ChangeType   int
 	changeReason []string
 }
 
 func (a ActionStruct) isEmpty() bool {
-	if a.ChangeType == 0 && a.changeReason == nil {
+	if a.ResourceName == "" {
 		return true
 	}
 	return false
@@ -37,5 +38,5 @@ func CreateActions(config *config.ConfigStruct, state *config.ConfigStruct) []Ac
 	repoActions := createRepoActions(config.Repos, state.Repos)
 	gpgActions := createGpgActions(config.Gpg_keys, state.Gpg_keys)
 
-	return append(append(mirrorActions, repoActions...), gpgActions...)
+	return append(append(gpgActions, mirrorActions...), repoActions...)
 }

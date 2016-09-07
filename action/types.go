@@ -9,3 +9,9 @@ const (
 	Repo_create
 	Gpg_add
 )
+
+const (
+	mirrorType = iota
+	repoType
+	gpgType
+)

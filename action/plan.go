@@ -28,6 +28,8 @@ func (a ActionStruct) Plan() error {
 		message = fmt.Sprintf("+gpg key %s will be added. Reason: %s", a.ResourceName, strings.Join(a.changeReason, ","))
 	case a.ChangeType == Noop:
 		message = fmt.Sprintf("resource unchanged: %s", a.ResourceName)
+  default:
+		message = fmt.Sprintf("no case matched")
 	}
 
 	fmt.Println(message)

@@ -16,11 +16,32 @@ type AptlyCli struct{}
 
 var aptlyCmd string = "aptly"
 
+func cleanSlice(slice []string) []string{
+
+	var clean_slice []string
+
+	for _, elem := range slice {
+		if elem != "" {
+			clean_slice = append(clean_slice, elem)
+		}
+	}
+	return clean_slice
+}
+
+func (a *AptlyCli) Gpg_add(gpg_key string) ([]string, error) {
+
+	out, err := utils.Exec("gpg", "--no-default-keyring", "--keyring", "trustedkeys.gpg", "--keyserver", "keys.gnupg.net", "--recv-keys", gpg_key)
+	if err != nil {
+		return out, err
+	}
+	return out, nil
+}
+
 func (a *AptlyCli) Mirror_list() ([]string, error) {
 
 	mirrors, err := utils.Exec(aptlyCmd, "mirror", "list", "-raw")
 	if err != nil {
-		return nil, err
+		return mirrors, err
 	}
 	return mirrors, nil
 }
@@ -58,9 +79,9 @@ func (a *AptlyCli) Mirror_create(mirror mirror.AptlyMirrorStruct) ([]string, err
 		}
 
 		if len(filter_cmds) > 1 {
-			filter_cmd = fmt.Sprintf("-filter='%s'", strings.Join(filter_cmds, " | "))
+			filter_cmd = fmt.Sprintf("-filter=%s", strings.Join(filter_cmds, " | "))
 		} else if len(filter_cmds) == 1 {
-			filter_cmd = fmt.Sprintf("-filter='%s'", filter_cmds[0])
+			filter_cmd = fmt.Sprintf("-filter=%s", filter_cmds[0])
 		}
 	}
 
@@ -68,7 +89,10 @@ func (a *AptlyCli) Mirror_create(mirror mirror.AptlyMirrorStruct) ([]string, err
 		filter_with_deps_cmd = "-filter-with-deps"
 	}
 
-	out, err := utils.Exec(aptlyCmd, "mirror", "create", filter_cmd, filter_with_deps_cmd, mirror.Name, mirror.Url, mirror.Dist, component)
+	args := []string{"mirror", "create", filter_cmd, filter_with_deps_cmd, mirror.Name, mirror.Url, mirror.Dist, component}
+	args = cleanSlice(args)
+
+	out, err := utils.Exec(aptlyCmd, args...)
 
 	return out, err
 }
@@ -94,11 +118,11 @@ func createAptlyMirrorFilterCommand(filter mirror.AptlyFilterStruct) string {
 
 	var f []string
 	if !utils.IsStringEmpty(filter.Name) {
-		f = append(f, fmt.Sprintf("Name (= %s)", filter.Name))
+		f = append(f, fmt.Sprintf("Name (= %s )", filter.Name))
 	}
 
 	if !utils.IsStringEmpty(filter.Version) {
-		f = append(f, fmt.Sprintf("$Version (= %s)", filter.Version))
+		f = append(f, fmt.Sprintf("$Version (= %s )", filter.Version))
 	}
 
 	f_str := ""
