@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"github.com/queeno/aptlify/config"
 )
 
 type ActionStruct struct {
@@ -64,4 +65,13 @@ func (a ActionStruct) Plan() error {
 	fmt.Println(message)
 	return nil
 
+}
+
+func CreateActions(config *config.ConfigStruct, state *config.ConfigStruct) []ActionStruct {
+
+	mirrorActions := createMirrorActions(config.Mirrors, state.Mirrors)
+	repoActions := createRepoActions(config.Repos, state.Repos)
+	gpgActions := createGpgActions(config.Gpg_keys, state.Gpg_keys)
+
+	return append(append(mirrorActions, repoActions...), gpgActions...)
 }

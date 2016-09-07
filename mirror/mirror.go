@@ -1,9 +1,5 @@
 package mirror
 
-import (
-	"github.com/queeno/aptlify/action"
-)
-
 type AptlyFilterStruct struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
@@ -24,7 +20,7 @@ type AptlyMirrorStruct struct {
 }
 
 
-func SearchMirrorInAptlyMirrors(thisMirror AptlyMirrorStruct, Mirrors []AptlyMirrorStruct) AptlyMirrorStruct {
+func (thisMirror AptlyMirrorStruct) SearchMirrorInAptlyMirrors(Mirrors []AptlyMirrorStruct) AptlyMirrorStruct {
 
 	for _, mirror := range Mirrors {
 			if mirror.Name == thisMirror.Name {
@@ -33,51 +29,6 @@ func SearchMirrorInAptlyMirrors(thisMirror AptlyMirrorStruct, Mirrors []AptlyMir
 	}
 
 	return AptlyMirrorStruct{}
-}
-
-func CreateMirrorActions(configMirrors []AptlyMirrorStruct, stateMirrors []AptlyMirrorStruct) []action.ActionStruct {
-
-	var actions = []action.ActionStruct{}
-
-	for _, configMirror := range configMirrors {
-		actions = append(actions, configMirror.Compare(SearchMirrorInAptlyMirrors(configMirror, stateMirrors)))
-	}
-
-	return actions
-
-}
-
-func (a AptlyMirrorStruct) Compare (b AptlyMirrorStruct) action.ActionStruct {
-
-	var ac = action.ActionStruct{ResourceName: a.Name, ChangeType: action.Noop }
-
-	if a.Url != b.Url {
-		ac.ChangeType = action.Mirror_recreate
-		ac.AddReasonToAction("url")
-	}
-
-	if a.Dist != b.Dist {
-		ac.ChangeType = action.Mirror_recreate
-		ac.AddReasonToAction("distribution")
-	}
-
-	if a.Component != b.Component {
-		ac.ChangeType = action.Mirror_recreate
-		ac.AddReasonToAction("component")
-	}
-
-	if a.FilterDeps != b.FilterDeps {
-		ac.ChangeType = action.Mirror_recreate
-		ac.AddReasonToAction("filter-deps")
-	}
-
-	if diff, _, _ := diffFilterSlices(a.Filter, b.Filter); diff != nil {
-		ac.ChangeType = action.Mirror_recreate
-		ac.AddReasonToAction("filter")
-	}
-
-	return ac
-
 }
 
 

@@ -5,7 +5,10 @@ import (
 )
 
 func apply(cmd *commander.Command, args []string) error {
-	return nil
+
+return nil
+
+
 }
 
 func makeCmdApply() *commander.Command {

@@ -17,7 +17,7 @@ func uniqueFiltersOnLeft(filts1 []AptlyFilterStruct, filts2 []AptlyFilterStruct)
 	return newFilters, nil
 }
 
-func diffFilterSlices(filts1 []AptlyFilterStruct, filts2 []AptlyFilterStruct) ([]AptlyFilterStruct, []AptlyFilterStruct, error) {
+func DiffFilterSlices(filts1 []AptlyFilterStruct, filts2 []AptlyFilterStruct) ([]AptlyFilterStruct, []AptlyFilterStruct, error) {
 	var newFilters1 []AptlyFilterStruct
 	var newFilters2 []AptlyFilterStruct
 	var err error
