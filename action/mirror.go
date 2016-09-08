@@ -4,6 +4,22 @@ import (
   "github.com/queeno/aptlify/mirror"
 )
 
+func UpdateMirrors(mirrors []mirror.AptlyMirrorStruct) []ActionStruct {
+
+  var actions = []ActionStruct{}
+  var action = ActionStruct{}
+
+  for _, mirror := range mirrors {
+    action = ActionStruct{ResourceName: mirror.Name, ChangeType: Mirror_update, ResourceType: mirrorType}
+    action.AddReasonToAction("update_mirror_requested")
+    actions = append(actions, action)
+  }
+
+  return actions
+
+}
+
+
 func createMirrorActions(configMirrors []mirror.AptlyMirrorStruct, stateMirrors []mirror.AptlyMirrorStruct) []ActionStruct {
 
 	var actions = []ActionStruct{}

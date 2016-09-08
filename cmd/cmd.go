@@ -16,6 +16,7 @@ unique, simple, configuration-driven tool`,
 			makeCmdApply(),
 			makeCmdPlan(),
 			makeCmdDump(),
+			makeCmdMirror(),
 		},
 	}
 
