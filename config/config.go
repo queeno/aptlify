@@ -4,7 +4,7 @@ import (
 	"github.com/queeno/aptlify/mirror"
 	"github.com/queeno/aptlify/repo"
 	"github.com/queeno/aptlify/gpg"
-	"github.com/queeno/aptlify/publish"
+	"github.com/queeno/aptlify/snapshot"
 	"encoding/json"
 	"os"
 )
@@ -13,7 +13,7 @@ type ConfigStruct struct {
 	Mirrors 	[]mirror.AptlyMirrorStruct		`json:"mirrors"`
 	Repos   	[]repo.AptlyRepoStruct				`json:"repos"`
 	Gpg_keys	gpg.AptlyGpgStruct						`json:"gpg_keys"`
-	Publish   []PublishStruct								`json:publish`
+	Snapshots []snapshot.SnapshotStruct			`json:"snapshots"`
 }
 
 var Config ConfigStruct = ConfigStruct{}

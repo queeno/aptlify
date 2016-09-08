@@ -12,10 +12,11 @@ import (
 )
 
 type ActionStruct struct {
-	ResourceName string
-	ResourceType int
-	ChangeType   int
-	changeReason []string
+	ResourceName 			string
+	ResourceType 			int
+	ChangeType  			int
+	changeReason			[]string
+	SnapshotRevision 	int
 }
 
 func (a ActionStruct) isEmpty() bool {
@@ -37,6 +38,7 @@ func CreateActions(config *config.ConfigStruct, state *config.ConfigStruct) []Ac
 	mirrorActions := createMirrorActions(config.Mirrors, state.Mirrors)
 	repoActions := createRepoActions(config.Repos, state.Repos)
 	gpgActions := createGpgActions(config.Gpg_keys, state.Gpg_keys)
+	snapshotActions := createSnapshotActions(config.Snapshots, state.Snapshots)
 
-	return append(append(gpgActions, mirrorActions...), repoActions...)
+	return append(append(append(gpgActions, mirrorActions...), repoActions...), snapshotActions...)
 }

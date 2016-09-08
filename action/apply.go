@@ -91,6 +91,9 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		new_state.AddGpg(a.ResourceName)
 		colour.Green(fmt.Sprintf("gpg %s creation succeeded", a.ResourceName))
 
+	case a.ChangeType == Snapshot_update:
+
+
 	case a.ChangeType == Noop:
 		if a.ResourceType == mirrorType {
 			findMirror := mirror.AptlyMirrorStruct{ Name: a.ResourceName }

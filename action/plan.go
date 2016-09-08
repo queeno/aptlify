@@ -26,6 +26,8 @@ func (a ActionStruct) Plan() error {
 		message = fmt.Sprintf("+repo %s will be created. Reason: %s", a.ResourceName, strings.Join(a.changeReason, ","))
 	case a.ChangeType == Gpg_add:
 		message = fmt.Sprintf("+gpg key %s will be added. Reason: %s", a.ResourceName, strings.Join(a.changeReason, ","))
+	case a.ChangeType == Snapshot_update:
+		message = fmt.Sprintf("+snapshot %s will be updated at revision %05d. Reason: %s", a.ResourceName, a.SnapshotRevision, strings.Join(a.changeReason, ","))
 	case a.ChangeType == Noop:
 		message = fmt.Sprintf("resource unchanged: %s", a.ResourceName)
   default:
