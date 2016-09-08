@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 MAINTAINER Philip Harries / Simon Aquino
 
 RUN echo "deb http://repo.aptly.info/ squeeze main" >> /etc/apt/sources.list.d/aptly.list && \
-  echo "deb ftp://ftp.uk.debian.org/debian/ stretch universe main" >> /etc/apt/sources.list.d/golang.list && \
+  echo "deb http://ftp.uk.debian.org/debian/ stretch universe main" >> /etc/apt/sources.list.d/golang.list && \
   apt-key adv --keyserver keys.gnupg.net --recv-keys 9E3E53F19C7DE460 8B48AD6246925553 && \
   apt-get update && \
   apt-get install -y aptly golang-1.7 git && \
