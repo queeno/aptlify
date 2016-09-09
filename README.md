@@ -26,7 +26,7 @@ The file should include 4 sections: `gpg_keys`, `mirrors`, `repos`, `snapshots`
     - `component`: The upstream mirror component
     - `filter`: An array of filters which describe the package names and versions that will be filtered. The array must include:
       - `name`: The name of the package to fetch from the mirror.
-        `version`: The version of the package to fetch from the mirror.
+      - `version`: The version of the package to fetch from the mirror.
     - `filter-with-deps`: Whether to pass the `filter-with-deps` flag to the command to fetch the filtered package dependencies.
   - `repos` should contain an array of aptly repo definitions:
       - `name`: The name of the repo to create.
@@ -35,10 +35,10 @@ The file should include 4 sections: `gpg_keys`, `mirrors`, `repos`, `snapshots`
     - `name`: The name of the combined snapshot to create.
       `resources`: An array of mirrors or repos to include in the snapshot.
       - `name`: The name of the resource to include in the snapshot.
-        `type`: The type of the resource (either mirror or repo)
-        `filter`: The filter to apply to the resource. If no filter is specified, the whole content of the resource is included in the snapshot.
+      - `type`: The type of the resource (either mirror or repo)
+      - `filter`: The filter to apply to the resource. If no filter is specified, the whole content of the resource is included in the snapshot.
         - `name`: The name of the package to filter.
-          `version`: The version of the package to filter.
+        - `version`: The version of the package to filter.
 
 ### Example `~/.aptlify.conf`
 
