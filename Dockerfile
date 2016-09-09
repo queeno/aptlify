@@ -22,5 +22,7 @@ RUN cd /root/gowork/src/github.com/queeno/aptlify && \
   gom install && \
   gom build -o /bin/aptlify main.go
 
+RUN cp /aptlify/tests/aptlify.conf /root/.aptlify.conf
+
 RUN /aptlify/run_tests.sh
 

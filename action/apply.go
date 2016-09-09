@@ -95,10 +95,12 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		findSnapshot := snap.AptlySnapshotStruct{Name: a.ResourceName}
 		snapshot := findSnapshot.SearchSnapshotInAptlySnapshots(conf.Snapshots)
 
+		fmt.Println("Snapshot update has been passed revision: %05d", a.SnapshotRevision)
+
 		var inter_snapshot_names []string
 		var temp_snapshot_name string
 		var del_snapshot_name string
-		var combined_snapshot string
+		var combinedSnapshotName string
 		var out []string
 		var err error
 
@@ -112,7 +114,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 				return
 			}
 
-			if resource.Filter.IsEmpty() {
+			if resource.Filter != nil {
 				del_snapshot_name = temp_snapshot_name
 				out, err, temp_snapshot_name = aptly.SnapshotFilter(resource, temp_snapshot_name)
 				if err != nil {
@@ -121,7 +123,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 					fmt.Println(strings.Join(out, " "))
 					return
 				}
-				out, err = aptly.SnapshotDrop(del_snapshot_name)
+				out, err = aptly.SnapshotDrop(del_snapshot_name, true)
 				if err != nil {
 					msg := fmt.Sprintf("snapshot %s drop failed", del_snapshot_name)
 					colour.Red(msg)
@@ -132,16 +134,20 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 			inter_snapshot_names = append(inter_snapshot_names, temp_snapshot_name)
 		}
 
-		out, err, combined_snapshot = aptly.SnapshotMerge(inter_snapshot_names)
+		textRevision := fmt.Sprintf("%05d", snapshot.Revision)
+		fmt.Println(textRevision)
+		combinedSnapNameArr := []string{snapshot.Name, textRevision}
+		combinedSnapshotName = strings.Join(combinedSnapNameArr, "_")
+		out, err = aptly.SnapshotMerge(combinedSnapshotName, inter_snapshot_names)
 		if err != nil {
-			msg := fmt.Sprintf("snapshot %s merge failed", combined_snapshot)
-			colour.Red(msg)
+			msg := fmt.Sprintf("snapshot %s merge failed", combinedSnapshotName)
+			colour.Red(msg, err)
 			fmt.Println(strings.Join(out, " "))
 			return
 		}
 
 		for _, s := range inter_snapshot_names {
-			out, err = aptly.SnapshotDrop(s)
+			out, err = aptly.SnapshotDrop(s, true)
 			if err != nil {
 				msg := fmt.Sprintf("snapshot %s drop failed", s)
 				colour.Red(msg)
@@ -149,10 +155,10 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 			}
 		}
 
-		s := snap.AptlySnapshotStruct{Name: combined_snapshot, Revision: a.SnapshotRevision}
+		s := snap.AptlySnapshotStruct{Name: combinedSnapshotName, Revision: a.SnapshotRevision}
 		new_state.AddSnapshot(s)
 
-		colour.Green(fmt.Sprintf("combined snapshot created %s at revision %d", combined_snapshot, a.SnapshotRevision))
+		colour.Green(fmt.Sprintf("combined snapshot created %s at revision %d", combinedSnapshotName, a.SnapshotRevision))
 
 	case a.ChangeType == Noop:
 		if a.ResourceType == mirrorType {

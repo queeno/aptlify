@@ -114,11 +114,55 @@ func (a *AptlyCli) Repo_create(repoName string) ([]string, error) {
 	return out, err
 }
 
-func SnapshotCreate(res snapshot.ResourceStruct) ([]string, error, string) {
+func (a *AptlyCli) SnapshotCreate(res snapshot.ResourceStruct) ([]string, error, string) {
 	var snapNameArr = []string{res.Name, timestamp()}
+	var out []string
+	var err error
 	snapName := strings.Join(snapNameArr, "_")
-	out, err := utils.Exec(aptlyCmd, "snapshot", "create", snapName, "from", res.Type, res.Name)
+	if res.Type == "mirror" {
+		if out, err = utils.Exec(aptlyCmd, "mirror", "update", res.Name); err != nil {
+			return out, err, ""
+		}
+	}
+	out, err = utils.Exec(aptlyCmd, "snapshot", "create", snapName, "from", res.Type, res.Name)
 	return out, err, snapName
+}
+
+func (a *AptlyCli) SnapshotFilter(res snapshot.ResourceStruct, baseSnapName string) ([]string, error, string) {
+	var snapNameArr = []string{baseSnapName, "filtered"}
+	snapName := strings.Join(snapNameArr, "_")
+	filterCmd := ""
+	var filterCmds []string
+	if res.Filter != nil {
+		for _, filter := range res.Filter {
+			filterCmds = append(filterCmds, createAptlyMirrorFilterCommand(filter))
+		}
+
+		if len(filterCmds) > 1 {
+			filterCmd = strings.Join(filterCmds, " | ")
+		} else if len(filterCmds) == 1 {
+			filterCmd = filterCmds[0]
+		}
+	}
+	out, err := utils.Exec(aptlyCmd, "snapshot", "filter", baseSnapName, snapName, filterCmd)
+	return out, err, snapName
+}
+
+func (a *AptlyCli) SnapshotDrop(snapshotName string, force bool) ([]string, error) {
+	forceParam := "-force=false"
+	if force {
+		forceParam = "-force=true"
+	}
+	out, err := utils.Exec(aptlyCmd, "snapshot", "drop", forceParam, snapshotName)
+	return out, err
+}
+
+func (a *AptlyCli) SnapshotMerge(combinedName string, inputSnapshotNames []string) ([]string, error) {
+	args := []string{"merge", combinedName}
+	fmt.Println(args)
+	args = append(args, inputSnapshotNames...)
+	fmt.Println(args)
+	return utils.Exec(aptlyCmd, args...)
 }
 
 /* Supporting functions */

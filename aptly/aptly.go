@@ -2,6 +2,7 @@ package aptly
 
 import (
 	"github.com/queeno/aptlify/mirror"
+	"github.com/queeno/aptlify/snapshot"
 )
 
 type Aptly interface {
@@ -15,4 +16,12 @@ type Aptly interface {
 	Repo_list() ([]string, error)
 	// repo_add: IN: repo-name, OUT: error
 	Repo_create(string) ([]string, error)
+	// snapshot_create: IN: res ResourceStruct OUT: []string, error, string
+	SnapshotCreate(snapshot.ResourceStruct) ([]string, error, string)
+	// snapshot_filter: IN: ResourceStruct, string OUT: []string, error, string
+	SnapshotFilter(snapshot.ResourceStruct, string) ([]string, error, string)
+	// snapshot_drop: IN: snapname(string), force(bool), OUT: []string, err
+	SnapshotDrop(string, bool) ([]string, error)
+	// snapshot merge: IN []string snapshot names: OUT: []string, error, string (combined_snapshot_name)
+	SnapshotMerge(string, []string) ([]string, error)
 }

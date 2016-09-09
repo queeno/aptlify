@@ -1,7 +1,6 @@
 package aptly
 
 import (
-	// "github.com/queeno/aptlify/config"
 	"github.com/queeno/aptlify/mirror"
 	"github.com/queeno/aptlify/snapshot"
 	. "gopkg.in/check.v1"
@@ -26,10 +25,11 @@ func (s *AptlyCliSuite) TestCreateAptlyMirrorFilterCommand(c *C) {
 
 func (s *AptlyCliSuite) TestSnapShotCreate(c *C) {
 
+	a := AptlyCli{}
 	testResource := snapshot.ResourceStruct{}
 	testResource.Name = "NNNNNNNotAResource1092340987213"
 	testResource.Type = "mirror"
-	outstring, err, snapname := SnapshotCreate(testResource)
+	outstring, err, snapname := a.SnapshotCreate(testResource)
 	c.Check(outstring[0], Equals, "ERROR: unable to create snapshot: mirror with name NNNNNNNotAResource1092340987213 not found")
 	c.Check(snapname, Matches, "NNNNNNNotAResource1092340987213_....-..-.._..:..:..")
 	c.Assert(err, ErrorMatches, "exit status 1")
