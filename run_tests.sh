@@ -34,5 +34,7 @@ go test -v github.com/queeno/aptlify/aptly -check.v
 go test -v github.com/queeno/aptlify/gpg -check.v
 go test -v github.com/queeno/aptlify/exec -check.v
 
+cp sample_config.json ~/.aptlify.conf
+
 aptlify plan
 aptlify apply
