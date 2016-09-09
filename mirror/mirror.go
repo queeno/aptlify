@@ -5,9 +5,16 @@ type AptlyFilterStruct struct {
 	Version string `json:"version"`
 }
 
+func (f AptlyFilterStruct) IsEmpty() bool {
+	if f.Name == "" {
+		return true
+	}
+	return false	
+}
+
 func (a AptlyFilterStruct) Equals(b AptlyFilterStruct) bool {
 	return (a.Name == b.Name) && (a.Version == b.Version)
-}
+	}
 
 
 type AptlyMirrorStruct struct {
