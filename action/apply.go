@@ -95,6 +95,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		findSnapshot := snap.AptlySnapshotStruct{Name: a.ResourceName}
 		snapshot := findSnapshot.SearchSnapshotInAptlySnapshots(conf.Snapshots)
 
+		fmt.Println(snapshot.Name)
 		fmt.Println(fmt.Sprintf("Snapshot update has been passed revision: %05d", a.SnapshotRevision))
 
 		var inter_snapshot_names []string
@@ -155,10 +156,10 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 			}
 		}
 
-		s := snap.AptlySnapshotStruct{Name: combinedSnapshotName, Revision: a.SnapshotRevision}
+		s := snap.AptlySnapshotStruct{Name: snapshot.Name, Revision: a.SnapshotRevision}
 		new_state.AddSnapshot(s)
 
-		colour.Green(fmt.Sprintf("combined snapshot created %s at revision %d", combinedSnapshotName, a.SnapshotRevision))
+		colour.Green(fmt.Sprintf("combined snapshot created %s at revision %d", snapshot.Name, a.SnapshotRevision))
 
 	case a.ChangeType == Noop:
 		if a.ResourceType == mirrorType {
