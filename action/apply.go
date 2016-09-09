@@ -112,7 +112,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 				return
 			}
 
-			if resource.Filter != nil {
+			if resource.Filter.IsEmpty() {
 				del_snapshot_name = temp_snapshot_name
 				out, err, temp_snapshot_name = aptly.SnapshotFilter(resource, temp_snapshot_name)
 				if err != nil {
