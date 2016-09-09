@@ -95,7 +95,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		findSnapshot := snap.AptlySnapshotStruct{Name: a.ResourceName}
 		snapshot := findSnapshot.SearchSnapshotInAptlySnapshots(conf.Snapshots)
 
-		fmt.Println("Snapshot update has been passed revision: %05d", a.SnapshotRevision)
+		fmt.Println(fmt.Sprintf("Snapshot update has been passed revision: %05d", a.SnapshotRevision))
 
 		var inter_snapshot_names []string
 		var temp_snapshot_name string
@@ -134,7 +134,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 			inter_snapshot_names = append(inter_snapshot_names, temp_snapshot_name)
 		}
 
-		textRevision := fmt.Sprintf("%05d", snapshot.Revision)
+		textRevision := fmt.Sprintf("%05d", a.SnapshotRevision)
 		fmt.Println(textRevision)
 		combinedSnapNameArr := []string{snapshot.Name, textRevision}
 		combinedSnapshotName = strings.Join(combinedSnapNameArr, "_")

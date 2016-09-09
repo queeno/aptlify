@@ -158,7 +158,7 @@ func (a *AptlyCli) SnapshotDrop(snapshotName string, force bool) ([]string, erro
 }
 
 func (a *AptlyCli) SnapshotMerge(combinedName string, inputSnapshotNames []string) ([]string, error) {
-	args := []string{"merge", combinedName}
+	args := []string{"snapshot", "merge", combinedName}
 	fmt.Println(args)
 	args = append(args, inputSnapshotNames...)
 	fmt.Println(args)
