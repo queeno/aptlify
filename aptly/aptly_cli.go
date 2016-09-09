@@ -3,8 +3,10 @@ package aptly
 import (
 	"fmt"
 	"github.com/queeno/aptlify/mirror"
+	"github.com/queeno/aptlify/snapshot"
 	"github.com/queeno/aptlify/utils"
 	"strings"
+	"time"
 )
 
 // Check interface
@@ -16,7 +18,7 @@ type AptlyCli struct{}
 
 var aptlyCmd string = "aptly"
 
-func cleanSlice(slice []string) []string{
+func cleanSlice(slice []string) []string {
 
 	var clean_slice []string
 
@@ -112,6 +114,13 @@ func (a *AptlyCli) Repo_create(repoName string) ([]string, error) {
 	return out, err
 }
 
+func SnapshotCreate(res snapshot.ResourceStruct) ([]string, error, string) {
+	var snapNameArr = []string{res.Name, timestamp()}
+	snapName := strings.Join(snapNameArr, "_")
+	out, err := utils.Exec(aptlyCmd, "snapshot", "create", snapName, "from", res.Type, res.Name)
+	return out, err, snapName
+}
+
 /* Supporting functions */
 
 func createAptlyMirrorFilterCommand(filter mirror.AptlyFilterStruct) string {
@@ -135,4 +144,10 @@ func createAptlyMirrorFilterCommand(filter mirror.AptlyFilterStruct) string {
 
 	return f_str
 
+}
+
+func timestamp() string {
+	t := time.Now()
+	return fmt.Sprintf("%d-%02d-%02d_%02d:%02d:%02d", t.Year(), t.Month(),
+		t.Day(), t.Hour(), t.Minute(), t.Second())
 }

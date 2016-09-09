@@ -1,9 +1,8 @@
 package action
 
 import (
-  "github.com/queeno/aptlify/snapshot"
+	"github.com/queeno/aptlify/snapshot"
 )
-
 
 func createSnapshotActions(configSnapshots []snapshot.AptlySnapshotStruct, stateSnapshots []snapshot.AptlySnapshotStruct) []ActionStruct {
 
@@ -23,12 +22,12 @@ func createSnapshotActions(configSnapshots []snapshot.AptlySnapshotStruct, state
 
 }
 
-func updateSnapshot (a snapshot.AptlySnapshotStruct, revision int) ActionStruct {
+func updateSnapshot(a snapshot.AptlySnapshotStruct, revision int) ActionStruct {
 
-	var ac = ActionStruct{	ResourceName: a.Name,
-													ChangeType: Snapshot_update,
-													ResourceType: snapshotType,
-												 	SnapshotRevision: revision+1 }
+	var ac = ActionStruct{ResourceName: a.Name,
+		ChangeType:       Snapshot_update,
+		ResourceType:     snapshotType,
+		SnapshotRevision: revision + 1}
 
 	ac.AddReasonToAction("update_snapshot")
 

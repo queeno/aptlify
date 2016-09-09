@@ -1,13 +1,13 @@
 package action
 
 import (
+	"fmt"
+	colour "github.com/fatih/color"
 	aptlylib "github.com/queeno/aptlify/aptly"
+	"github.com/queeno/aptlify/config"
 	"github.com/queeno/aptlify/mirror"
 	"github.com/queeno/aptlify/repo"
-	"github.com/queeno/aptlify/config"
 	snap "github.com/queeno/aptlify/snapshot"
-	colour "github.com/fatih/color"
-	"fmt"
 	"strings"
 )
 
@@ -18,7 +18,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 	switch {
 
 	case a.ChangeType == Mirror_update:
-		findMirror := mirror.AptlyMirrorStruct{ Name: a.ResourceName }
+		findMirror := mirror.AptlyMirrorStruct{Name: a.ResourceName}
 		mir := findMirror.SearchMirrorInAptlyMirrors(conf.Mirrors)
 		out, err := aptly.Mirror_update(a.ResourceName)
 		if err != nil {
@@ -31,7 +31,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		colour.Green(fmt.Sprintf("mirror %s update succeeded", a.ResourceName))
 
 	case a.ChangeType == Mirror_create:
-		findMirror := mirror.AptlyMirrorStruct{ Name: a.ResourceName }
+		findMirror := mirror.AptlyMirrorStruct{Name: a.ResourceName}
 		mirror := findMirror.SearchMirrorInAptlyMirrors(conf.Mirrors)
 		out, err := aptly.Mirror_create(mirror)
 		if err != nil {
@@ -42,7 +42,6 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		}
 		new_state.AddMirror(mirror)
 		colour.Green(fmt.Sprintf("mirror %s create succeeded", a.ResourceName))
-
 
 	case a.ChangeType == Mirror_recreate:
 
@@ -55,7 +54,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		}
 		colour.Green(fmt.Sprintf("mirror %s drop succeeded", a.ResourceName))
 
-		findMirror := mirror.AptlyMirrorStruct{ Name: a.ResourceName }
+		findMirror := mirror.AptlyMirrorStruct{Name: a.ResourceName}
 		mir := findMirror.SearchMirrorInAptlyMirrors(conf.Mirrors)
 
 		out, err = aptly.Mirror_create(mir)
@@ -69,7 +68,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		colour.Green(fmt.Sprintf("mirror %s create succeeded", a.ResourceName))
 
 	case a.ChangeType == Repo_create:
-		findRepo := repo.AptlyRepoStruct { Name: a.ResourceName }
+		findRepo := repo.AptlyRepoStruct{Name: a.ResourceName}
 		repo := findRepo.SearchRepoInAptlyRepos(conf.Repos)
 		out, err := aptly.Repo_create(a.ResourceName)
 		if err != nil {
@@ -93,7 +92,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		colour.Green(fmt.Sprintf("gpg %s creation succeeded", a.ResourceName))
 
 	case a.ChangeType == Snapshot_update:
-		findSnapshot := snap.AptlySnapshotStruct { Name: a.ResourceName }
+		findSnapshot := snap.AptlySnapshotStruct{Name: a.ResourceName}
 		snapshot := findSnapshot.SearchSnapshotInAptlySnapshots(conf.Snapshots)
 
 		var inter_snapshot_names []string
@@ -114,20 +113,20 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 			}
 
 			if resource.Filter != nil {
-					del_snapshot_name = temp_snapshot_name
-					out, err, temp_snapshot_name = aptly.SnapshotFilter(resource, temp_snapshot_name)
-					if err != nil {
-						msg := fmt.Sprintf("snapshot %s filter failed", temp_snapshot_name)
-						colour.Red(msg)
-						fmt.Println(strings.Join(out, " "))
-						return
-					}
-					out, err = aptly.SnapshotDrop(del_snapshot_name)
-					if err != nil {
-						msg := fmt.Sprintf("snapshot %s drop failed", del_snapshot_name)
-						colour.Red(msg)
-						fmt.Println(strings.Join(out, " "))
-					}
+				del_snapshot_name = temp_snapshot_name
+				out, err, temp_snapshot_name = aptly.SnapshotFilter(resource, temp_snapshot_name)
+				if err != nil {
+					msg := fmt.Sprintf("snapshot %s filter failed", temp_snapshot_name)
+					colour.Red(msg)
+					fmt.Println(strings.Join(out, " "))
+					return
+				}
+				out, err = aptly.SnapshotDrop(del_snapshot_name)
+				if err != nil {
+					msg := fmt.Sprintf("snapshot %s drop failed", del_snapshot_name)
+					colour.Red(msg)
+					fmt.Println(strings.Join(out, " "))
+				}
 			}
 
 			inter_snapshot_names = append(inter_snapshot_names, temp_snapshot_name)
@@ -155,14 +154,13 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 
 		colour.Green(fmt.Sprintf("combined snapshot created %s at revision %d", combined_snapshot, a.SnapshotRevision))
 
-
 	case a.ChangeType == Noop:
 		if a.ResourceType == mirrorType {
-			findMirror := mirror.AptlyMirrorStruct{ Name: a.ResourceName }
+			findMirror := mirror.AptlyMirrorStruct{Name: a.ResourceName}
 			mir := findMirror.SearchMirrorInAptlyMirrors(conf.Mirrors)
 			new_state.AddMirror(mir)
 		} else if a.ResourceType == repoType {
-			findRepo := repo.AptlyRepoStruct { Name: a.ResourceName }
+			findRepo := repo.AptlyRepoStruct{Name: a.ResourceName}
 			repo := findRepo.SearchRepoInAptlyRepos(conf.Repos)
 			new_state.AddRepo(repo)
 		} else if a.ResourceType == gpgType {
