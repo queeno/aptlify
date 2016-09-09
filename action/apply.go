@@ -92,6 +92,25 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		colour.Green(fmt.Sprintf("gpg %s creation succeeded", a.ResourceName))
 
 	case a.ChangeType == Snapshot_update:
+		findSnapshot := snapshot.AptlySnapshotStruct { Name: a.ResourceName }
+		snapshot := findSnapshot.SearchSnapshotInAptlySnapshots(conf.Snapshots)
+
+		var inter_snapshot_names []string
+		var temp_snapshot_name string
+
+		for _, resource := snapshot.Resources {
+
+			temp_snapshot_name = aptly.Snapshot_create(resource)
+
+			if snapshot.Resources.Filter != nil {
+					temp_snapshot_name = aptly.Snapshot_filter(resource, temp_snapshot_name)
+			}
+
+			inter_snapshot_names = apppend(inter_snapshot_names, )
+
+		}
+
+
 
 
 	case a.ChangeType == Noop:
