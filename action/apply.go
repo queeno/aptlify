@@ -141,7 +141,7 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		out, err = aptly.SnapshotMerge(combinedSnapshotName, inter_snapshot_names)
 		if err != nil {
 			msg := fmt.Sprintf("snapshot %s merge failed", combinedSnapshotName)
-			colour.Red(msg, err)
+			colour.Red(msg)
 			fmt.Println(strings.Join(out, " "))
 			return
 		}
