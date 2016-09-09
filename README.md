@@ -4,10 +4,10 @@ Aptlify is a tool to drive aptly through a JSON configuration file.
 
 ## Commands
 
-Plan - Create an change plan
-Apply - Apply the staged changes
-Mirror - Update the mirrors
-Dump - Show the current aptly state
+- Plan - Create an change plan
+- Apply - Apply the staged changes
+- Mirror - Update the mirrors
+- Dump - Show the current aptly state
 
 ## How to use
 
