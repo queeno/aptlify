@@ -32,13 +32,7 @@ gom -test install
 go test -v github.com/queeno/aptlify/utils -check.v
 go test -v github.com/queeno/aptlify/aptly -check.v
 go test -v github.com/queeno/aptlify/gpg -check.v
+go test -v github.com/queeno/aptlify/exec -check.v
 
 aptlify plan
-#for mir in `aptly mirror list -raw`;do
-#	aptly mirror update "${mir}"
-#done
 aptlify apply
-#for mir in `aptly mirror list -raw`;do
-#	aptly mirror update "${mir}"
-#done
-#aptlify apply

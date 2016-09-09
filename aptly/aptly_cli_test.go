@@ -30,7 +30,7 @@ func (s *AptlyCliSuite) TestSnapShotCreate(c *C) {
 	testResource.Name = "NNNNNNNotAResource1092340987213"
 	testResource.Type = "mirror"
 	outstring, err, snapname := a.SnapshotCreate(testResource)
-	c.Check(outstring[0], Equals, "ERROR: unable to create snapshot: mirror with name NNNNNNNotAResource1092340987213 not found")
+	c.Check(outstring[0], Equals, "ERROR: unable to update: mirror with name NNNNNNNotAResource1092340987213 not found")
 	c.Check(snapname, Matches, "NNNNNNNotAResource1092340987213_....-..-.._..:..:..")
 	c.Assert(err, ErrorMatches, "exit status 1")
 }
