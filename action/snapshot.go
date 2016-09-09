@@ -5,7 +5,7 @@ import (
 )
 
 
-func createSnapshotActions(configSnapshots []snapshot.SnapshotStruct, stateSnapshots []snapshot.SnapshotStruct) []ActionStruct {
+func createSnapshotActions(configSnapshots []snapshot.AptlySnapshotStruct, stateSnapshots []snapshot.AptlySnapshotStruct) []ActionStruct {
 
 	var actions = []ActionStruct{}
 
@@ -23,7 +23,7 @@ func createSnapshotActions(configSnapshots []snapshot.SnapshotStruct, stateSnaps
 
 }
 
-func updateSnapshot (a snapshot.SnapshotStruct, revision int) ActionStruct {
+func updateSnapshot (a snapshot.AptlySnapshotStruct, revision int) ActionStruct {
 
 	var ac = ActionStruct{	ResourceName: a.Name,
 													ChangeType: Snapshot_update,

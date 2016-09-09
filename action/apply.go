@@ -5,6 +5,7 @@ import (
 	"github.com/queeno/aptlify/mirror"
 	"github.com/queeno/aptlify/repo"
 	"github.com/queeno/aptlify/config"
+	snap "github.com/queeno/aptlify/snapshot"
 	colour "github.com/fatih/color"
 	"fmt"
 	"strings"
@@ -92,25 +93,67 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		colour.Green(fmt.Sprintf("gpg %s creation succeeded", a.ResourceName))
 
 	case a.ChangeType == Snapshot_update:
-		findSnapshot := snapshot.AptlySnapshotStruct { Name: a.ResourceName }
+		findSnapshot := snap.AptlySnapshotStruct { Name: a.ResourceName }
 		snapshot := findSnapshot.SearchSnapshotInAptlySnapshots(conf.Snapshots)
 
 		var inter_snapshot_names []string
 		var temp_snapshot_name string
+		var del_snapshot_name string
+		var combined_snapshot string
+		var out []string
+		var err error
 
-		for _, resource := snapshot.Resources {
+		for _, resource := range snapshot.Resources {
 
-			temp_snapshot_name = aptly.Snapshot_create(resource)
-
-			if snapshot.Resources.Filter != nil {
-					temp_snapshot_name = aptly.Snapshot_filter(resource, temp_snapshot_name)
+			out, err, temp_snapshot_name = aptly.SnapshotCreate(resource)
+			if err != nil {
+				msg := fmt.Sprintf("snapshot %s creation failed", temp_snapshot_name)
+				colour.Red(msg)
+				fmt.Println(strings.Join(out, " "))
+				return
 			}
 
-			inter_snapshot_names = apppend(inter_snapshot_names, )
+			if resource.Filter != nil {
+					del_snapshot_name = temp_snapshot_name
+					out, err, temp_snapshot_name = aptly.SnapshotFilter(resource, temp_snapshot_name)
+					if err != nil {
+						msg := fmt.Sprintf("snapshot %s filter failed", temp_snapshot_name)
+						colour.Red(msg)
+						fmt.Println(strings.Join(out, " "))
+						return
+					}
+					out, err = aptly.SnapshotDrop(del_snapshot_name)
+					if err != nil {
+						msg := fmt.Sprintf("snapshot %s drop failed", del_snapshot_name)
+						colour.Red(msg)
+						fmt.Println(strings.Join(out, " "))
+					}
+			}
 
+			inter_snapshot_names = append(inter_snapshot_names, temp_snapshot_name)
 		}
 
+		out, err, combined_snapshot = aptly.SnapshotMerge(inter_snapshot_names)
+		if err != nil {
+			msg := fmt.Sprintf("snapshot %s merge failed", combined_snapshot)
+			colour.Red(msg)
+			fmt.Println(strings.Join(out, " "))
+			return
+		}
 
+		for _, s := range inter_snapshot_names {
+			out, err = aptly.SnapshotDrop(s)
+			if err != nil {
+				msg := fmt.Sprintf("snapshot %s drop failed", s)
+				colour.Red(msg)
+				fmt.Println(strings.Join(out, " "))
+			}
+		}
+
+		s := snap.AptlySnapshotStruct{Name: combined_snapshot, Revision: a.SnapshotRevision}
+		new_state.AddSnapshot(s)
+
+		colour.Green(fmt.Sprintf("combined snapshot created %s at revision %d", combined_snapshot, a.SnapshotRevision))
 
 
 	case a.ChangeType == Noop:

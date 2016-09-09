@@ -10,14 +10,23 @@ import (
 )
 
 type ConfigStruct struct {
-	Mirrors 	[]mirror.AptlyMirrorStruct		`json:"mirrors"`
-	Repos   	[]repo.AptlyRepoStruct				`json:"repos"`
-	Gpg_keys	gpg.AptlyGpgStruct						`json:"gpg_keys"`
-	Snapshots []snapshot.SnapshotStruct			`json:"snapshots"`
+	Mirrors 	[]mirror.AptlyMirrorStruct			`json:"mirrors"`
+	Repos   	[]repo.AptlyRepoStruct					`json:"repos"`
+	Gpg_keys	gpg.AptlyGpgStruct							`json:"gpg_keys"`
+	Snapshots []snapshot.AptlySnapshotStruct	`json:"snapshots"`
 }
 
 var Config ConfigStruct = ConfigStruct{}
 var State ConfigStruct = ConfigStruct{}
+
+func (c *ConfigStruct) AddSnapshot(s snapshot.AptlySnapshotStruct){
+
+	if s.IsEmpty() {
+		return
+	}
+
+	c.Snapshots = append(c.Snapshots, s)
+}
 
 func (c *ConfigStruct) AddMirror(m mirror.AptlyMirrorStruct) {
 
