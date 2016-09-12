@@ -19,6 +19,8 @@ type AptlyCli struct{}
 
 var aptlyCmd string = "aptly"
 
+var execExec = exec.Exec
+
 func cleanSlice(slice []string) []string {
 
 	var clean_slice []string
@@ -33,7 +35,7 @@ func cleanSlice(slice []string) []string {
 
 func (a *AptlyCli) Gpg_add(gpg_key string) ([]string, error) {
 
-	out, err := exec.Exec("gpg", "--no-default-keyring", "--keyring", "trustedkeys.gpg", "--keyserver", "keys.gnupg.net", "--recv-keys", gpg_key)
+	out, err := execExec("gpg", "--no-default-keyring", "--keyring", "trustedkeys.gpg", "--keyserver", "keys.gnupg.net", "--recv-keys", gpg_key)
 	if err != nil {
 		return out, err
 	}
@@ -42,7 +44,7 @@ func (a *AptlyCli) Gpg_add(gpg_key string) ([]string, error) {
 
 func (a *AptlyCli) Mirror_list() ([]string, error) {
 
-	mirrors, err := exec.Exec(aptlyCmd, "mirror", "list", "-raw")
+	mirrors, err := execExec(aptlyCmd, "mirror", "list", "-raw")
 	if err != nil {
 		return mirrors, err
 	}
@@ -50,7 +52,7 @@ func (a *AptlyCli) Mirror_list() ([]string, error) {
 }
 
 func (a *AptlyCli) Mirror_update(mirrorName string) ([]string, error) {
-	out, err := exec.Exec(aptlyCmd, "mirror", "update", mirrorName)
+	out, err := execExec(aptlyCmd, "mirror", "update", mirrorName)
 	return out, err
 }
 
@@ -95,23 +97,23 @@ func (a *AptlyCli) Mirror_create(mirror mirror.AptlyMirrorStruct) ([]string, err
 	args := []string{"mirror", "create", filter_cmd, filter_with_deps_cmd, mirror.Name, mirror.Url, mirror.Dist, component}
 	args = cleanSlice(args)
 
-	out, err := exec.Exec(aptlyCmd, args...)
+	out, err := execExec(aptlyCmd, args...)
 
 	return out, err
 }
 
 func (a *AptlyCli) Repo_list() ([]string, error) {
-	repos, err := exec.Exec(aptlyCmd, "repo", "list", "-raw")
+	repos, err := execExec(aptlyCmd, "repo", "list", "-raw")
 	return repos, err
 }
 
 func (a *AptlyCli) Mirror_drop(mirrorName string) ([]string, error) {
-	out, err := exec.Exec(aptlyCmd, "mirror", "drop", mirrorName)
+	out, err := execExec(aptlyCmd, "mirror", "drop", mirrorName)
 	return out, err
 }
 
 func (a *AptlyCli) Repo_create(repoName string) ([]string, error) {
-	out, err := exec.Exec(aptlyCmd, "repo", "create", repoName)
+	out, err := execExec(aptlyCmd, "repo", "create", repoName)
 	return out, err
 }
 
@@ -121,11 +123,11 @@ func (a *AptlyCli) SnapshotCreate(res snapshot.ResourceStruct) ([]string, error,
 	var err error
 	snapName := strings.Join(snapNameArr, "_")
 	if res.Type == "mirror" {
-		if out, err = exec.Exec(aptlyCmd, "mirror", "update", res.Name); err != nil {
+		if out, err = execExec(aptlyCmd, "mirror", "update", res.Name); err != nil {
 			return out, err, snapName
 		}
 	}
-	out, err = exec.Exec(aptlyCmd, "snapshot", "create", snapName, "from", res.Type, res.Name)
+	out, err = execExec(aptlyCmd, "snapshot", "create", snapName, "from", res.Type, res.Name)
 	return out, err, snapName
 }
 
@@ -145,7 +147,7 @@ func (a *AptlyCli) SnapshotFilter(res snapshot.ResourceStruct, baseSnapName stri
 			filterCmd = filterCmds[0]
 		}
 	}
-	out, err := exec.Exec(aptlyCmd, "snapshot", "filter", baseSnapName, snapName, filterCmd)
+	out, err := execExec(aptlyCmd, "snapshot", "filter", baseSnapName, snapName, filterCmd)
 	return out, err, snapName
 }
 
@@ -154,14 +156,14 @@ func (a *AptlyCli) SnapshotDrop(snapshotName string, force bool) ([]string, erro
 	if force {
 		forceParam = "-force=true"
 	}
-	out, err := exec.Exec(aptlyCmd, "snapshot", "drop", forceParam, snapshotName)
+	out, err := execExec(aptlyCmd, "snapshot", "drop", forceParam, snapshotName)
 	return out, err
 }
 
 func (a *AptlyCli) SnapshotMerge(combinedName string, inputSnapshotNames []string) ([]string, error) {
 	args := []string{"snapshot", "merge", combinedName}
 	args = append(args, inputSnapshotNames...)
-	return exec.Exec(aptlyCmd, args...)
+	return execExec(aptlyCmd, args...)
 }
 
 /* Supporting functions */
