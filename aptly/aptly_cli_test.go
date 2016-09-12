@@ -19,12 +19,23 @@ var _ = Suite(&AptlyCliSuite{})
 
 func (s *AptlyCliSuite) TestCreateAptlyMirrorFilterCommand(c *C) {
 
-	testFilter := mirror.AptlyFilterStruct{}
-	testFilter.Name = "package"
-	testFilter.Version = "1.0.0"
+	testFilter1 := mirror.AptlyFilterStruct{}
+	testFilter1.Name = "package"
+	testFilter1.Version = "1.0.0"
 
-	testCommand := createAptlyMirrorFilterCommand(testFilter)
-	c.Check(testCommand, Equals, "( Name (= package ) , $Version (= 1.0.0 ) )")
+	testFilter2 := mirror.AptlyFilterStruct{}
+	testFilter2.Version = "1.0.0"
+
+	testFilter3 := mirror.AptlyFilterStruct{}
+	testFilter3.Name = "package"
+
+	testCommand1 := createAptlyMirrorFilterCommand(testFilter1)
+	testCommand2 := createAptlyMirrorFilterCommand(testFilter2)
+	testCommand3 := createAptlyMirrorFilterCommand(testFilter3)
+
+	c.Check(testCommand1, Equals, "( Name (= package ) , $Version (= 1.0.0 ) )")
+	c.Check(testCommand2, Equals, "( $Version (= 1.0.0 ) )")
+	c.Check(testCommand3, Equals, "( Name (= package ) )")
 }
 
 func (s *AptlyCliSuite) TestSnapShotCreate(c *C) {
@@ -50,30 +61,6 @@ func (s *AptlyCliSuite) TestSnapShotMerge(c *C) {
 	c.Check(outstring[1], Equals, "Snapshot testCombinedSnapshot successfully created.")
 	c.Check(outstring[2], Equals, "You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as Debian repository.")
 	c.Assert(err, Equals, nil)
-}
-
-func fakeExecExec(command string, args ...string) ([]string, error) {
-	cs := []string{"-test.run=TestHelperProcess", "--", command}
-	cs = append(cs, args...)
-	cmd, err := exec.Exec(os.Args[0], cs...)
-	return cmd, err
-}
-
-func TestHelperProcess(t *testing.T) {
-	testOutput := map[string]string{
-		"aptly snapshot merge testCombinedSnapshot input1 input2": `
-Snapshot testCombinedSnapshot successfully created.
-You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as Debian repository.`,
-	}
-	testError := map[string]int{
-		"placeholder failing command - replace when": 2,
-	}
-	commandString := strings.Join(os.Args[3:], " ")
-	fmt.Fprintf(os.Stdout, testOutput[commandString])
-	if testError[commandString] != 0 {
-		os.Exit(testError[commandString])
-	}
-	os.Exit(0)
 }
 
 func (s *AptlyCliSuite) TestCleanSlice(c *C) {
@@ -105,4 +92,39 @@ func (s *AptlyCliSuite) TestCleanSlice(c *C) {
 	c.Assert(test_d[3], Equals, "d")
 	c.Assert(test_e[0], Equals, " ")
 	c.Assert(len(test_f), Equals, 0)
+}
+
+// Helper functions
+
+func fakeExecExec(command string, args ...string) ([]string, error) {
+	cs := []string{"-test.run=TestHelperProcess", "--", command}
+	cs = append(cs, args...)
+	cmd, err := exec.Exec(os.Args[0], cs...)
+	return cmd, err
+}
+
+func TestHelperProcess(t *testing.T) {
+	testOutput := map[string]string{
+		"aptly snapshot merge testCombinedSnapshot input1 input2": `
+Snapshot testCombinedSnapshot successfully created.
+You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as Debian repository.`,
+	}
+	testError := map[string]int{
+		"placeholder failing command - replace when": 2,
+	}
+	if len(os.Args) > 2 {
+		if os.Args[1] == "-test.run=TestHelperProcess" {
+			commandString := strings.Join(os.Args[3:], " ")
+			if testOutput[commandString] == "" {
+				fmt.Fprintf(os.Stdout, commandString)
+			} else {
+				fmt.Fprintf(os.Stdout, testOutput[commandString])
+			}
+			if testError[commandString] != 0 {
+				os.Exit(testError[commandString])
+			}
+			os.Exit(0)
+		}
+	}
+	return
 }
