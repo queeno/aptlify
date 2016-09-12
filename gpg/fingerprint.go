@@ -2,10 +2,11 @@ package gpg
 
 import (
 	"errors"
-	"fmt"
 	"github.com/queeno/aptlify/exec"
 	"strings"
 )
+
+var execExec = exec.Exec
 
 func extractFingerprints(output []string) ([]string, error) {
 	var s []string
@@ -21,11 +22,8 @@ func extractFingerprints(output []string) ([]string, error) {
 }
 
 func keyLoaded(keyFingerprint string) bool {
-
-	//ctx.Logging.Info.Println(fmt.Sprintf("Can we find %s", keyFingerprint))
-	fingerprintArray, _ := exec.Exec("apt-key finger --with-colons")
+	fingerprintArray, _ := execExec("apt-key finger --with-colons")
 	extractedFingerprints, _ := extractFingerprints(fingerprintArray)
-	fmt.Println(extractedFingerprints)
 	for _, extractedFingerprint := range extractedFingerprints {
 		if keyFingerprint == extractedFingerprint {
 			return true
