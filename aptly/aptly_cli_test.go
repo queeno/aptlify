@@ -38,6 +38,24 @@ func (s *AptlyCliSuite) TestCreateAptlyMirrorFilterCommand(c *C) {
 	c.Check(testCommand3, Equals, "( Name (= package ) )")
 }
 
+func (s *AptlyCliSuite) TestSnapShotCreateFailure(c *C) {
+
+	a := AptlyCli{}
+	testResource := snapshot.ResourceStruct{}
+	testResource.Name = "test_mirror_fail"
+	testResource.Type = "mirror"
+    //Fake exec
+    execExec = fakeExecExec
+    defer func(){ execExec = exec.Exec }()
+    //Fake time
+    timestamp = fakeTimestamp
+    defer func(){ timestamp = realTimestamp }()
+	outstring, err, snapname := a.SnapshotCreate(testResource)
+	c.Check(outstring[0], Equals, "ERROR: unable to create snapshot: mirror with name test_mirror_fail not found")
+	c.Check(snapname, Equals, "test_mirror_fail_1970-01-01_00:00:00")
+	c.Assert(err, ErrorMatches, "exit status 1")
+}
+
 func (s *AptlyCliSuite) TestSnapShotCreateSuccess(c *C) {
 
 	a := AptlyCli{}
@@ -56,7 +74,7 @@ func (s *AptlyCliSuite) TestSnapShotCreateSuccess(c *C) {
 	c.Assert(err, Equals, nil)
 }
 
-func (s *AptlyCliSuite) TestSnapShotMerge(c *C) {
+func (s *AptlyCliSuite) TestSnapShotMergeSuccess(c *C) {
 	a := AptlyCli{}
 	combinedName := "testCombinedSnapshot"
 	inputSnapshotNames := []string{"input1", "input2"}
@@ -137,9 +155,11 @@ You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as
         "aptly snapshot create test_mirror_1970-01-01_00:00:00 from mirror test_mirror": `
 Snapshot test_mirror_1970-01-01_00:00:00 successfully created.
 You can run 'aptly publish snapshot test_mirror_1970-01-01_00:00:00' to publish snapshot as Debian repository.`,
+        "aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": `ERROR: unable to create snapshot: mirror with name test_mirror_fail not found`,
     }
     testError:= map[string]int{
         "aptly snapshot merge testCombinedSnapshot input1 input_no_exist": 1,
+        "aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": 1,
     }
 	if len(os.Args) > 2 {
 		if os.Args[1] == "-test.run=TestHelperProcess" {
