@@ -21,6 +21,8 @@ var aptlyCmd string = "aptly"
 
 var execExec = exec.Exec
 
+var timestamp = realTimestamp
+
 func cleanSlice(slice []string) []string {
 
 	var clean_slice []string
@@ -191,7 +193,7 @@ func createAptlyMirrorFilterCommand(filter mirror.AptlyFilterStruct) string {
 
 }
 
-func timestamp() string {
+func realTimestamp() string {
 	t := time.Now()
 	return fmt.Sprintf("%d-%02d-%02d_%02d:%02d:%02d", t.Year(), t.Month(),
 		t.Day(), t.Hour(), t.Minute(), t.Second())
