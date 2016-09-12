@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestAptlyCli(t *testing.T) { TestingT(t) }
@@ -44,12 +45,12 @@ func (s *AptlyCliSuite) TestSnapShotCreateFailure(c *C) {
 	testResource := snapshot.ResourceStruct{}
 	testResource.Name = "test_mirror_fail"
 	testResource.Type = "mirror"
-    //Fake exec
-    execExec = fakeExecExec
-    defer func(){ execExec = exec.Exec }()
-    //Fake time
-    timestamp = fakeTimestamp
-    defer func(){ timestamp = realTimestamp }()
+	//Fake exec
+	execExec = fakeExecExec
+	defer func() { execExec = exec.Exec }()
+	//Fake time
+	timestamp = fakeTimestamp
+	defer func() { timestamp = realTimestamp }()
 	outstring, err, snapname := a.SnapshotCreate(testResource)
 	c.Check(outstring[0], Equals, "ERROR: unable to create snapshot: mirror with name test_mirror_fail not found")
 	c.Check(snapname, Equals, "test_mirror_fail_1970-01-01_00:00:00")
@@ -62,12 +63,12 @@ func (s *AptlyCliSuite) TestSnapShotCreateUpdateFail(c *C) {
 	testResource := snapshot.ResourceStruct{}
 	testResource.Name = "test_mirror_no_exist"
 	testResource.Type = "mirror"
-    //Fake exec
-    execExec = fakeExecExec
-    defer func(){ execExec = exec.Exec }()
-    //Fake time
-    timestamp = fakeTimestamp
-    defer func(){ timestamp = realTimestamp }()
+	//Fake exec
+	execExec = fakeExecExec
+	defer func() { execExec = exec.Exec }()
+	//Fake time
+	timestamp = fakeTimestamp
+	defer func() { timestamp = realTimestamp }()
 	outstring, err, snapname := a.SnapshotCreate(testResource)
 	c.Check(outstring[0], Equals, "ERROR: unable to update: mirror with name test_mirror_no_exist not found")
 	c.Check(snapname, Equals, "test_mirror_no_exist_1970-01-01_00:00:00")
@@ -79,12 +80,12 @@ func (s *AptlyCliSuite) TestSnapShotCreateSuccess(c *C) {
 	testResource := snapshot.ResourceStruct{}
 	testResource.Name = "test_mirror"
 	testResource.Type = "mirror"
-    //Fake exec
-    execExec = fakeExecExec
-    defer func(){ execExec = exec.Exec }()
-    //Fake time
-    timestamp = fakeTimestamp
-    defer func(){ timestamp = realTimestamp }()
+	//Fake exec
+	execExec = fakeExecExec
+	defer func() { execExec = exec.Exec }()
+	//Fake time
+	timestamp = fakeTimestamp
+	defer func() { timestamp = realTimestamp }()
 	outstring, err, snapname := a.SnapshotCreate(testResource)
 	c.Check(outstring[1], Equals, "Snapshot test_mirror_1970-01-01_00:00:00 successfully created.")
 	c.Check(snapname, Equals, "test_mirror_1970-01-01_00:00:00")
@@ -135,15 +136,27 @@ func (s *AptlyCliSuite) TestCleanSlice(c *C) {
 	c.Assert(len(test_f), Equals, 0)
 }
 func (s *AptlyCliSuite) TestSnapShotMergeFailure(c *C) {
-    a := AptlyCli {}
-    combinedName := "testCombinedSnapshot"
-    inputSnapshotNames := []string{"input1", "input_no_exist"}
-    //Fake exec
-    execExec = fakeExecExec
-    defer func(){ execExec = exec.Exec }()
-    outstring, err := a.SnapshotMerge(combinedName, inputSnapshotNames)
-    c.Check(outstring[1], Equals, "ERROR: unable to load snapshot: snapshot with name input1 not found")
+	a := AptlyCli{}
+	combinedName := "testCombinedSnapshot"
+	inputSnapshotNames := []string{"input1", "input_no_exist"}
+	//Fake exec
+	execExec = fakeExecExec
+	defer func() { execExec = exec.Exec }()
+	outstring, err := a.SnapshotMerge(combinedName, inputSnapshotNames)
+	c.Check(outstring[1], Equals, "ERROR: unable to load snapshot: snapshot with name input1 not found")
 	c.Assert(err, ErrorMatches, "exit status 1")
+}
+
+func (s *AptlyCliSuite) TestRealTimestamp(c *C) {
+	testTime := time.Now()
+	funcTimeStr := realTimestamp()
+	funcTime, err := time.Parse("2006-01-02_15:04:05", funcTimeStr)
+	equalEnough := false
+	if funcTime == testTime || funcTime.Sub(testTime) < 3*time.Second || testTime.Sub(funcTime) < 3*time.Second {
+		equalEnough = true
+	}
+	c.Assert(equalEnough, Equals, true)
+	c.Assert(err, Equals, nil)
 }
 
 // Helper functions
@@ -156,30 +169,30 @@ func fakeExecExec(command string, args ...string) ([]string, error) {
 }
 
 func fakeTimestamp() string {
-    return "1970-01-01_00:00:00"
+	return "1970-01-01_00:00:00"
 }
 
-func TestHelperProcess(t *testing.T){
-    testOutput := map[string]string{
-        "aptly snapshot merge testCombinedSnapshot input1 input2": `
+func TestHelperProcess(t *testing.T) {
+	testOutput := map[string]string{
+		"aptly snapshot merge testCombinedSnapshot input1 input2": `
 Snapshot testCombinedSnapshot successfully created.
 You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as Debian repository.`,
-        "aptly snapshot merge testCombinedSnapshot input1 input_no_exist": `
+		"aptly snapshot merge testCombinedSnapshot input1 input_no_exist": `
 ERROR: unable to load snapshot: snapshot with name input1 not found`,
-        "aptly snapshot create from mirror test_mirror": `
+		"aptly snapshot create from mirror test_mirror": `
 Snapshot testCombinedSnapshot successfully created.
 You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as Debian repository.`,
-        "aptly snapshot create test_mirror_1970-01-01_00:00:00 from mirror test_mirror": `
+		"aptly snapshot create test_mirror_1970-01-01_00:00:00 from mirror test_mirror": `
 Snapshot test_mirror_1970-01-01_00:00:00 successfully created.
 You can run 'aptly publish snapshot test_mirror_1970-01-01_00:00:00' to publish snapshot as Debian repository.`,
-        "aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": `ERROR: unable to create snapshot: mirror with name test_mirror_fail not found`,
-        "aptly mirror update test_mirror_no_exist": `ERROR: unable to update: mirror with name test_mirror_no_exist not found`,
-    }
-    testError:= map[string]int{
-        "aptly mirror update test_mirror_no_exist": 1,
-        "aptly snapshot merge testCombinedSnapshot input1 input_no_exist": 1,
-        "aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": 1,
-    }
+		"aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": `ERROR: unable to create snapshot: mirror with name test_mirror_fail not found`,
+		"aptly mirror update test_mirror_no_exist":                                                `ERROR: unable to update: mirror with name test_mirror_no_exist not found`,
+	}
+	testError := map[string]int{
+		"aptly mirror update test_mirror_no_exist":                                                1,
+		"aptly snapshot merge testCombinedSnapshot input1 input_no_exist":                         1,
+		"aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": 1,
+	}
 	if len(os.Args) > 2 {
 		if os.Args[1] == "-test.run=TestHelperProcess" {
 			commandString := strings.Join(os.Args[3:], " ")
@@ -195,5 +208,5 @@ You can run 'aptly publish snapshot test_mirror_1970-01-01_00:00:00' to publish 
 		}
 	}
 	return
-    os.Exit(0)
+	os.Exit(0)
 }
