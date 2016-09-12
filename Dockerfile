@@ -11,18 +11,5 @@ RUN echo "deb http://repo.aptly.info/ squeeze main" >> /etc/apt/sources.list.d/a
   ln -s  /root/gowork/src/github.com/queeno/aptlify /aptlify && \
   GOPATH=/root/gowork go get github.com/mattn/gom
 
-
 ENV GOPATH /root/gowork
 ENV PATH /root/gowork/bin:/usr/bin:/usr/local/bin:/bin:/sbin:/usr/sbin
-
-COPY . /root/gowork/src/github.com/queeno/aptlify
-
-RUN cd /root/gowork/src/github.com/queeno/aptlify && \
-  rm -rf /root/gowork/src/github.com/queeno/aptlify/vendor && \
-  gom install && \
-  gom build -o /bin/aptlify main.go
-
-RUN cp /aptlify/sample_aptlify.conf /root/.aptlify.conf
-
-RUN /aptlify/run_tests.sh
-

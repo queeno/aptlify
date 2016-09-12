@@ -3,4 +3,5 @@ gom 'github.com/fatih/color', :commit => '87d4004f2ab62d0d255e0a38f1680aa534549f
 
 group :test do
   gom 'gopkg.in/check.v1'
+  gom 'github.com/fsouza/go-dockerclient'
 end
