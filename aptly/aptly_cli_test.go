@@ -39,6 +39,37 @@ func (s *AptlyCliSuite) TestGpgAddFailure(c *C) {
 	c.Check(outstring[0], Equals, "gpg: requesting key FAKE from hkp server keys.gnupg.net")
 	c.Check(err, ErrorMatches, "exit status 2")
 }
+func (s *AptlyCliSuite) TestMirrorDropSuccess(c *C) {
+	a := AptlyCli{}
+	//Fake exec
+	execExec = fakeExecExec
+	defer func() { execExec = exec.Exec }()
+	testData := "test_mirror"
+	outstring, err := a.Mirror_drop(testData)
+	c.Check(outstring[0], Equals, "Mirror `test_mirror` has been removed.")
+	c.Check(err, Equals, nil)
+}
+
+func (s *AptlyCliSuite) TestRepoCreateSuccess(c *C) {
+	a := AptlyCli{}
+	//Fake exec
+	execExec = fakeExecExec
+	defer func() { execExec = exec.Exec }()
+	testData := "test_repo"
+	outstring, err := a.Repo_create(testData)
+	c.Check(outstring[2], Equals, "Local repo [test_repo] successfully added.")
+	c.Check(err, Equals, nil)
+}
+
+func (s *AptlyCliSuite) TestRepoListSuccess(c *C) {
+	a := AptlyCli{}
+	//Fake exec
+	execExec = fakeExecExec
+	defer func() { execExec = exec.Exec }()
+	outstring, err := a.Repo_list()
+	c.Check(outstring[0], Equals, "some_mirror")
+	c.Check(err, Equals, nil)
+}
 
 func (s *AptlyCliSuite) TestMirrorListSuccess(c *C) {
 	a := AptlyCli{}
@@ -366,6 +397,12 @@ gpgv: Good signature from "Launchpad PPA for Vincent Bernat"
 
 Mirror [test_mirror]: http://example.com test_dist successfully added.
 You can run 'aptly mirror update test_mirror' to download repository contents.`,
+		"aptly repo list -raw": "some_mirror",
+		"aptly repo create test_repo": `
+
+Local repo [test_repo] successfully added.
+You can run 'aptly repo add test_repo ...' to add packages to repository.`,
+		"aptly mirror drop test_mirror": "Mirror `test_mirror` has been removed.",
 	}
 	testError := map[string]int{
 		"gpg --no-default-keyring --keyring trustedkeys.gpg --keyserver keys.gnupg.net --recv-keys FAKE": 2,
