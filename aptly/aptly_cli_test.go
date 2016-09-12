@@ -147,6 +147,83 @@ func (s *AptlyCliSuite) TestSnapShotMergeFailure(c *C) {
 	c.Assert(err, ErrorMatches, "exit status 1")
 }
 
+func (s *AptlyCliSuite) TestSnapshotFilter(c *C) {
+	a := AptlyCli{}
+	r := snapshot.ResourceStruct{}
+	r.Name = "test"
+	r.Type = "mirror"
+	absentTestBaseSnapName := "absenttestbase"
+	presentTestBaseSnapName := "presenttestbase"
+
+	//Fake exec
+	execExec = fakeExecExec
+	defer func() { execExec = exec.Exec }()
+
+	out, err, outName := a.SnapshotFilter(r, absentTestBaseSnapName)
+	c.Assert(out[0], Equals, "ERROR: unable to filter: snapshot with name absenttestbase not found")
+	c.Assert(err, ErrorMatches, "exit status 1")
+	c.Assert(outName, Equals, "absenttestbase_filtered")
+
+	out, err, outName = a.SnapshotFilter(r, presentTestBaseSnapName)
+	c.Assert(out[0], Equals, "Loading packages (19)...")
+	c.Assert(err, Equals, nil)
+	c.Assert(outName, Equals, "presenttestbase_filtered")
+
+	filt1 := mirror.AptlyFilterStruct{}
+	filt1.Name = "package"
+	filt1.Version = "1.0.0"
+
+	r.Filter = []mirror.AptlyFilterStruct{}
+	r.Filter = append(r.Filter, filt1)
+
+	out, err, outName = a.SnapshotFilter(r, absentTestBaseSnapName)
+	c.Assert(out[0], Equals, "ERROR: unable to filter: snapshot with name absenttestbase not found")
+	c.Assert(err, ErrorMatches, "exit status 1")
+	c.Assert(outName, Equals, "absenttestbase_filtered")
+
+	out, err, outName = a.SnapshotFilter(r, presentTestBaseSnapName)
+	c.Assert(out[0], Equals, "Loading packages (19)...")
+	c.Assert(err, Equals, nil)
+	c.Assert(outName, Equals, "presenttestbase_filtered")
+
+	filt2 := mirror.AptlyFilterStruct{}
+	filt2.Name = "another_package"
+	filt2.Version = "2.3.4"
+
+	r.Filter = append(r.Filter, filt2)
+
+	out, err, outName = a.SnapshotFilter(r, absentTestBaseSnapName)
+	c.Assert(out[0], Equals, "ERROR: unable to filter: snapshot with name absenttestbase not found")
+	c.Assert(err, ErrorMatches, "exit status 1")
+	c.Assert(outName, Equals, "absenttestbase_filtered")
+
+	out, err, outName = a.SnapshotFilter(r, presentTestBaseSnapName)
+	c.Assert(out[0], Equals, "Loading packages (19)...")
+	c.Assert(err, Equals, nil)
+	c.Assert(outName, Equals, "presenttestbase_filtered")
+}
+
+func (s *AptlyCliSuite) TestSnapshotDrop(c *C) {
+	a := AptlyCli{}
+	presentSnapshotToDrop := "presentTestSnapshotToDrop"
+	absentSnapshotToDrop := "absentTestSnapshotToDrop"
+	//Fake exec
+	execExec = fakeExecExec
+	defer func() { execExec = exec.Exec }()
+	outstring, err := a.SnapshotDrop(presentSnapshotToDrop, false)
+	c.Check(outstring[0], Equals, "Snapshot `presentTestSnapshotToDrop` has been dropped")
+	c.Check(err, Equals, nil)
+	outstring, err = a.SnapshotDrop(absentSnapshotToDrop, false)
+	c.Check(outstring[0], Equals, "ERROR: unable to drop: snapshot with name absentTestSnapshotToDrop not found")
+	c.Check(err, Equals, nil)
+	outstring, err = a.SnapshotDrop(presentSnapshotToDrop, true)
+	c.Check(outstring[0], Equals, "Snapshot `presentTestSnapshotToDrop` has been dropped")
+	c.Check(err, Equals, nil)
+	outstring, err = a.SnapshotDrop(absentSnapshotToDrop, true)
+	c.Check(outstring[0], Equals, "ERROR: unable to drop: snapshot with name absentTestSnapshotToDrop not found")
+	c.Check(err, Equals, nil)
+}
+
 func (s *AptlyCliSuite) TestRealTimestamp(c *C) {
 	testTime := time.Now()
 	funcTimeStr := realTimestamp()
@@ -174,24 +251,51 @@ func fakeTimestamp() string {
 
 func TestHelperProcess(t *testing.T) {
 	testOutput := map[string]string{
-		"aptly snapshot merge testCombinedSnapshot input1 input2": `
+		fmt.Sprintf("%s snapshot merge testCombinedSnapshot input1 input2", aptlyCmd): `
 Snapshot testCombinedSnapshot successfully created.
 You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as Debian repository.`,
-		"aptly snapshot merge testCombinedSnapshot input1 input_no_exist": `
+		fmt.Sprintf("%s snapshot merge testCombinedSnapshot input1 input_no_exist", aptlyCmd): `
 ERROR: unable to load snapshot: snapshot with name input1 not found`,
-		"aptly snapshot create from mirror test_mirror": `
+		fmt.Sprintf("%s snapshot create from mirror test_mirror", aptlyCmd): `
 Snapshot testCombinedSnapshot successfully created.
 You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as Debian repository.`,
-		"aptly snapshot create test_mirror_1970-01-01_00:00:00 from mirror test_mirror": `
+		fmt.Sprintf("%s snapshot create test_mirror_1970-01-01_00:00:00 from mirror test_mirror", aptlyCmd): `
 Snapshot test_mirror_1970-01-01_00:00:00 successfully created.
 You can run 'aptly publish snapshot test_mirror_1970-01-01_00:00:00' to publish snapshot as Debian repository.`,
-		"aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": `ERROR: unable to create snapshot: mirror with name test_mirror_fail not found`,
-		"aptly mirror update test_mirror_no_exist":                                                `ERROR: unable to update: mirror with name test_mirror_no_exist not found`,
+		fmt.Sprintf("%s snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail", aptlyCmd): `ERROR: unable to create snapshot: mirror with name test_mirror_fail not found`,
+		fmt.Sprintf("%s mirror update test_mirror_no_exist", aptlyCmd):                                                `ERROR: unable to update: mirror with name test_mirror_no_exist not found`,
+
+		fmt.Sprintf("%s snapshot filter absenttestbase absenttestbase_filtered ", aptlyCmd): "ERROR: unable to filter: snapshot with name absenttestbase not found",
+		fmt.Sprintf("%s snapshot filter presenttestbase presenttestbase_filtered ", aptlyCmd): `Loading packages (19)...
+Building indexes...
+
+Snapshot presenttestbase successfully filtered.
+You can run 'aptly publish snapshot presenttestbase' to publish snapshot as Debian repository.`,
+		fmt.Sprintf("%s snapshot filter absenttestbase absenttestbase_filtered ( Name (= package ) , $Version (= 1.0.0 ) )", aptlyCmd): "ERROR: unable to filter: snapshot with name absenttestbase not found",
+		fmt.Sprintf("%s snapshot filter presenttestbase presenttestbase_filtered ( Name (= package ) , $Version (= 1.0.0 ) )", aptlyCmd): `Loading packages (19)...
+Building indexes...
+
+Snapshot presenttestbase successfully filtered.
+You can run 'aptly publish snapshot presenttestbase' to publish snapshot as Debian repository.`,
+		fmt.Sprintf("%s snapshot filter presenttestbase presenttestbase_filtered ( Name (= package ) , $Version (= 1.0.0 ) ) | ( Name (= another_package ) , $Version (= 2.3.4 ) )", aptlyCmd): `Loading packages (19)...
+Building indexes...
+
+Snapshot presenttestbase successfully filtered.
+You can run 'aptly publish snapshot presenttestbase' to publish snapshot as Debian repository.`,
+		fmt.Sprintf("%s snapshot filter absenttestbase absenttestbase_filtered ( Name (= package ) , $Version (= 1.0.0 ) ) | ( Name (= another_package ) , $Version (= 2.3.4 ) )", aptlyCmd): "ERROR: unable to filter: snapshot with name absenttestbase not found",
+
+		fmt.Sprintf("%s snapshot drop -force=false presentTestSnapshotToDrop", aptlyCmd): "Snapshot `presentTestSnapshotToDrop` has been dropped",
+		fmt.Sprintf("%s snapshot drop -force=true presentTestSnapshotToDrop", aptlyCmd):  "Snapshot `presentTestSnapshotToDrop` has been dropped",
+		fmt.Sprintf("%s snapshot drop -force=false absentTestSnapshotToDrop", aptlyCmd):  "ERROR: unable to drop: snapshot with name absentTestSnapshotToDrop not found",
+		fmt.Sprintf("%s snapshot drop -force=true absentTestSnapshotToDrop", aptlyCmd):   "ERROR: unable to drop: snapshot with name absentTestSnapshotToDrop not found",
 	}
 	testError := map[string]int{
-		"aptly mirror update test_mirror_no_exist":                                                1,
-		"aptly snapshot merge testCombinedSnapshot input1 input_no_exist":                         1,
-		"aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": 1,
+		fmt.Sprintf("%s mirror update test_mirror_no_exist", aptlyCmd):                                                                                                                       1,
+		fmt.Sprintf("%s snapshot merge testCombinedSnapshot input1 input_no_exist", aptlyCmd):                                                                                                1,
+		fmt.Sprintf("%s snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail", aptlyCmd):                                                                        1,
+		fmt.Sprintf("%s snapshot filter absenttestbase absenttestbase_filtered ", aptlyCmd):                                                                                                  1,
+		fmt.Sprintf("%s snapshot filter absenttestbase absenttestbase_filtered ( Name (= package ) , $Version (= 1.0.0 ) )", aptlyCmd):                                                       1,
+		fmt.Sprintf("%s snapshot filter absenttestbase absenttestbase_filtered ( Name (= package ) , $Version (= 1.0.0 ) ) | ( Name (= another_package ) , $Version (= 2.3.4 ) )", aptlyCmd): 1,
 	}
 	if len(os.Args) > 2 {
 		if os.Args[1] == "-test.run=TestHelperProcess" {
