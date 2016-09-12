@@ -16,7 +16,7 @@ func IsStringEmpty(element string) bool {
 	return len(element) == 0
 }
 
-func uniqueStringsOnLeft(arr1 []string, arr2 []string) ([]string, error) {
+func uniqueStringsOnLeft(arr1 []string, arr2 []string) []string {
 	var thisStrFound bool
 	var newStrings []string
 	for _, str1 := range arr1 {
@@ -30,18 +30,13 @@ func uniqueStringsOnLeft(arr1 []string, arr2 []string) ([]string, error) {
 			newStrings = append(newStrings, str1)
 		}
 	}
-	return newStrings, nil
+	return newStrings
 }
 
-func DiffStringSlices(arr1 []string, arr2 []string) ([]string, []string, error) {
+func DiffStringSlices(arr1 []string, arr2 []string) ([]string, []string) {
 	var newStrings1 []string
 	var newStrings2 []string
-	var err error
-	if newStrings1, err = uniqueStringsOnLeft(arr1, arr2); err != nil {
-		return nil, nil, err
-	}
-	if newStrings2, err = uniqueStringsOnLeft(arr2, arr1); err != nil {
-		return nil, nil, err
-	}
-	return newStrings1, newStrings2, nil
+	newStrings1 = uniqueStringsOnLeft(arr1, arr2)
+	newStrings2 = uniqueStringsOnLeft(arr2, arr1)
+	return newStrings1, newStrings2
 }

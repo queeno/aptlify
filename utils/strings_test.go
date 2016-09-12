@@ -53,98 +53,89 @@ func (s *StringSuite) TestIsStringEmptyWithNonEmptyString(c *C) {
 func (s *StringSuite) TestUniqueStringsOnLeftWithNoDiff(c *C) {
 	a := []string{"a", "b", "c"}
 	b := []string{"a", "b", "c"}
-	out, err := uniqueStringsOnLeft(a, b)
+	out := uniqueStringsOnLeft(a, b)
 	c.Assert(len(out), Equals, 0)
-	c.Assert(err, Equals, nil)
 }
 
 func (s *StringSuite) TestUniqueStringsOnLeftWithSingleDiff(c *C) {
 	a := []string{"a", "b", "c", "d"}
 	b := []string{"a", "b", "c"}
-	out, err := uniqueStringsOnLeft(a, b)
+	out := uniqueStringsOnLeft(a, b)
 	c.Assert(len(out), Equals, 1)
 	c.Assert(out[0], Equals, "d")
-	c.Assert(err, Equals, nil)
 }
 
 func (s *StringSuite) TestUniqueStringsOnLeftWithMultipleDiff(c *C) {
 	a := []string{"a", "b", "c", "d", "e", "f", "g"}
 	b := []string{"a", "c", "k"}
-	out, err := uniqueStringsOnLeft(a, b)
+	out := uniqueStringsOnLeft(a, b)
 	c.Assert(len(out), Equals, 5)
 	c.Assert(out[0], Equals, "b")
 	c.Assert(out[1], Equals, "d")
 	c.Assert(out[2], Equals, "e")
 	c.Assert(out[3], Equals, "f")
 	c.Assert(out[4], Equals, "g")
-	c.Assert(err, Equals, nil)
 }
 
 func (s *StringSuite) TestUniqueStringsOnLeftWithDiffOnRight(c *C) {
 	a := []string{"a", "b", "c"}
 	b := []string{"a", "b", "c", "d"}
-	out, err := uniqueStringsOnLeft(a, b)
+	out := uniqueStringsOnLeft(a, b)
 	c.Assert(len(out), Equals, 0)
-	c.Assert(err, Equals, nil)
 }
 
 func (s *StringSuite) TestDiffStringSlicesWithNoDiff(c *C) {
 	a := []string{"a", "b", "c"}
 	b := []string{"a", "b", "c"}
-	out1, out2, err := DiffStringSlices(a, b)
+	out1, out2 := DiffStringSlices(a, b)
 	c.Assert(len(out1), Equals, 0)
 	c.Assert(len(out2), Equals, 0)
-	c.Assert(err, Equals, nil)
 }
 
 func (s *StringSuite) TestDiffStringSlicesWithOneDiffLeft(c *C) {
 	a := []string{"a", "b", "c", "d"}
 	b := []string{"a", "b", "c"}
-	out1, out2, err := DiffStringSlices(a, b)
+	out1, out2 := DiffStringSlices(a, b)
 	c.Assert(len(out1), Equals, 1)
 	c.Assert(len(out2), Equals, 0)
 	c.Assert(out1[0], Equals, "d")
-	c.Assert(err, Equals, nil)
 }
 
 func (s *StringSuite) TestDiffStringSlicesWithOneDiffRight(c *C) {
 	a := []string{"a", "b", "c"}
 	b := []string{"a", "b", "c", "d"}
-	out1, out2, err := DiffStringSlices(a, b)
+	out1, out2 := DiffStringSlices(a, b)
 	c.Assert(len(out1), Equals, 0)
 	c.Assert(len(out2), Equals, 1)
 	c.Assert(out2[0], Equals, "d")
-	c.Assert(err, Equals, nil)
 }
 
 func (s *StringSuite) TestDiffStringSlicesWithMultipleDiffLeft(c *C) {
 	a := []string{"a", "b", "c", "d", "e", "f"}
 	b := []string{"a", "b", "c"}
-	out1, out2, err := DiffStringSlices(a, b)
+	out1, out2 := DiffStringSlices(a, b)
 	c.Assert(len(out1), Equals, 3)
 	c.Assert(len(out2), Equals, 0)
 	c.Assert(out1[0], Equals, "d")
 	c.Assert(out1[1], Equals, "e")
 	c.Assert(out1[2], Equals, "f")
-	c.Assert(err, Equals, nil)
 }
 
 func (s *StringSuite) TestDiffStringSlicesWithMultipleDiffRight(c *C) {
 	a := []string{"a", "b", "c"}
 	b := []string{"a", "b", "c", "d", "e", "f"}
-	out1, out2, err := DiffStringSlices(a, b)
+	out1, out2 := DiffStringSlices(a, b)
 	c.Assert(len(out1), Equals, 0)
 	c.Assert(len(out2), Equals, 3)
 	c.Assert(out2[0], Equals, "d")
 	c.Assert(out2[1], Equals, "e")
 	c.Assert(out2[2], Equals, "f")
-	c.Assert(err, Equals, nil)
 }
 
 func (s *StringSuite) TestDiffStringSlicesWithMultipleDiffs(c *C) {
 	a := []string{"b", "c", "d", "e", "f"}
 	b := []string{"a", "b", "c", "e", "g", "h", "i"}
-	out1, out2, err := DiffStringSlices(a, b)
+	out1, out2 := DiffStringSlices(a, b)
 	c.Assert(len(out1), Equals, 2)
 	c.Assert(len(out2), Equals, 4)
 	c.Assert(out1[0], Equals, "d")
@@ -153,5 +144,4 @@ func (s *StringSuite) TestDiffStringSlicesWithMultipleDiffs(c *C) {
 	c.Assert(out2[1], Equals, "g")
 	c.Assert(out2[2], Equals, "h")
 	c.Assert(out2[3], Equals, "i")
-	c.Assert(err, Equals, nil)
 }
