@@ -136,7 +136,6 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, new_state *config.ConfigS
 		}
 
 		textRevision := fmt.Sprintf("%05d", a.SnapshotRevision)
-		fmt.Println(textRevision)
 		combinedSnapNameArr := []string{snapshot.Name, textRevision}
 		combinedSnapshotName = strings.Join(combinedSnapNameArr, "_")
 		out, err = aptly.SnapshotMerge(combinedSnapshotName, inter_snapshot_names)
