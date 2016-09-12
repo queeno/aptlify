@@ -56,6 +56,23 @@ func (s *AptlyCliSuite) TestSnapShotCreateFailure(c *C) {
 	c.Assert(err, ErrorMatches, "exit status 1")
 }
 
+func (s *AptlyCliSuite) TestSnapShotCreateUpdateFail(c *C) {
+
+	a := AptlyCli{}
+	testResource := snapshot.ResourceStruct{}
+	testResource.Name = "test_mirror_no_exist"
+	testResource.Type = "mirror"
+    //Fake exec
+    execExec = fakeExecExec
+    defer func(){ execExec = exec.Exec }()
+    //Fake time
+    timestamp = fakeTimestamp
+    defer func(){ timestamp = realTimestamp }()
+	outstring, err, snapname := a.SnapshotCreate(testResource)
+	c.Check(outstring[0], Equals, "ERROR: unable to update: mirror with name test_mirror_no_exist not found")
+	c.Check(snapname, Equals, "test_mirror_no_exist_1970-01-01_00:00:00")
+	c.Assert(err, ErrorMatches, "exit status 1")
+}
 func (s *AptlyCliSuite) TestSnapShotCreateSuccess(c *C) {
 
 	a := AptlyCli{}
@@ -156,8 +173,10 @@ You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as
 Snapshot test_mirror_1970-01-01_00:00:00 successfully created.
 You can run 'aptly publish snapshot test_mirror_1970-01-01_00:00:00' to publish snapshot as Debian repository.`,
         "aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": `ERROR: unable to create snapshot: mirror with name test_mirror_fail not found`,
+        "aptly mirror update test_mirror_no_exist": `ERROR: unable to update: mirror with name test_mirror_no_exist not found`,
     }
     testError:= map[string]int{
+        "aptly mirror update test_mirror_no_exist": 1,
         "aptly snapshot merge testCombinedSnapshot input1 input_no_exist": 1,
         "aptly snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail": 1,
     }
