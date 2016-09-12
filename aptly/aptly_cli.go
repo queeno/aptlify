@@ -38,19 +38,13 @@ func cleanSlice(slice []string) []string {
 func (a *AptlyCli) Gpg_add(gpg_key string) ([]string, error) {
 
 	out, err := execExec("gpg", "--no-default-keyring", "--keyring", "trustedkeys.gpg", "--keyserver", "keys.gnupg.net", "--recv-keys", gpg_key)
-	if err != nil {
-		return out, err
-	}
-	return out, nil
+	return out, err
 }
 
 func (a *AptlyCli) Mirror_list() ([]string, error) {
 
 	mirrors, err := execExec(aptlyCmd, "mirror", "list", "-raw")
-	if err != nil {
-		return mirrors, err
-	}
-	return mirrors, nil
+	return mirrors, err
 }
 
 func (a *AptlyCli) Mirror_update(mirrorName string) ([]string, error) {
