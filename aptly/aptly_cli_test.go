@@ -531,5 +531,4 @@ You can run 'aptly repo add test_repo ...' to add packages to repository.`,
 		}
 	}
 	return
-	os.Exit(0)
 }
