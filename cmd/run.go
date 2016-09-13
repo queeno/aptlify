@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/gonuts/commander"
 	ctx "github.com/queeno/aptlify/context"
+	"github.com/smira/commander"
 )
 
 func Run(cmd *commander.Command, args []string, initialise bool) (returnCode int) {
@@ -10,12 +10,18 @@ func Run(cmd *commander.Command, args []string, initialise bool) (returnCode int
 
 	var err error
 
+	flags, args, err := cmd.ParseFlags(args)
+	if err != nil {
+		ctx.Logging.Fatal.Fatalf(err.Error())
+	}
+
 	if initialise {
-		err = initContext()
+		err = initContext(flags)
 		if err != nil {
 			ctx.Logging.Fatal.Fatalf(err.Error())
 		}
 	}
+
 	defer shutdownContext()
 
 	err = cmd.Dispatch(args)

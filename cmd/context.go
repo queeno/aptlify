@@ -2,12 +2,13 @@ package cmd
 
 import (
 	ctx "github.com/queeno/aptlify/context"
+	"github.com/smira/flag"
 )
 
 var context *ctx.AptlifyContext
 
 // Initialise context
-func initContext() error {
+func initContext(flags *flag.FlagSet) error {
 
 	var err error
 
@@ -15,7 +16,7 @@ func initContext() error {
 		ctx.Logging.Fatal.Fatalf("Context already initialised")
 	}
 
-	context, err = ctx.NewContext()
+	context, err = ctx.NewContext(flags)
 
 	return err
 }

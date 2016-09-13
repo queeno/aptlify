@@ -4,21 +4,25 @@ import (
 	"fmt"
 	"github.com/queeno/aptlify/config"
 	"github.com/queeno/aptlify/utils"
+	"github.com/smira/flag"
 	"os"
 	"path/filepath"
 )
 
 type AptlifyContext struct {
-	configLoaded bool
-	stateLoaded  bool
+	flags, globalFlags *flag.FlagSet
+	configLoaded       bool
+	stateLoaded        bool
 }
 
 var Logging = utils.NewLogging()
 
 // Creates a new configuration
-func NewContext() (*AptlifyContext, error) {
+func NewContext(flags *flag.FlagSet) (*AptlifyContext, error) {
 
 	context := &AptlifyContext{
+		flags:        flags,
+		globalFlags:  flags,
 		configLoaded: false,
 		stateLoaded:  false,
 	}
@@ -31,6 +35,36 @@ func NewContext() (*AptlifyContext, error) {
 
 func ShutdownContext() error {
 	return nil
+}
+
+// LookupOption (public) checks boolean flag
+func (context *AptlifyContext) LookupOption(defaultValue bool, name string) (result bool) {
+	return context.lookupOption(defaultValue, name)
+}
+
+// lookupOption (private)
+func (context *AptlifyContext) lookupOption(defaultValue bool, name string) (result bool) {
+	result = defaultValue
+	fmt.Println(context.globalFlags)
+	if context.globalFlags.IsSet(name) {
+		result = context.globalFlags.Lookup(name).Value.Get().(bool)
+	}
+	return
+}
+
+// set context copy of flags
+func (context *AptlifyContext) UpdateFlags(flags *flag.FlagSet) {
+	context.flags = flags
+}
+
+// get Flags
+func (context *AptlifyContext) Flags() *flag.FlagSet {
+	return context.flags
+}
+
+// GlobalFlags returns flags passed to all commands
+func (context *AptlifyContext) GlobalFlags() *flag.FlagSet {
+	return context.globalFlags
 }
 
 func (context *AptlifyContext) WriteState(state config.ConfigStruct) {
@@ -85,18 +119,26 @@ func (context *AptlifyContext) Config() *config.ConfigStruct {
 
 	var err error
 
-	filePaths := []string{
-		filepath.Join(os.Getenv("HOME"), ".aptlify.conf"),
-		"/etc/aptlify.conf",
-	}
-	for _, filePath := range filePaths {
-		err = config.LoadConfig(filePath, &config.Config)
-		if err == nil {
-			break
+	configLocation := context.globalFlags.Lookup("config").Value.String()
+	if configLocation != "" {
+		err = config.LoadConfig(configLocation, &config.Config)
+		if err != nil {
+			Logging.Fatal.Fatalf(fmt.Sprintf("error loading config file %s, %s", configLocation, err))
 		}
+	} else {
+		filePaths := []string{
+			filepath.Join(os.Getenv("HOME"), ".aptlify.conf"),
+			"/etc/aptlify.conf",
+		}
+		for _, filePath := range filePaths {
+			err = config.LoadConfig(filePath, &config.Config)
+			if err == nil {
+				break
+			}
 
-		if !os.IsNotExist(err) {
-			Logging.Fatal.Fatalf(fmt.Sprintf("error loading config file %s, %s", filePath, err))
+			if !os.IsNotExist(err) {
+				Logging.Fatal.Fatalf(fmt.Sprintf("error loading config file %s, %s", filePath, err))
+			}
 		}
 	}
 

@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/gonuts/commander"
 	"github.com/queeno/aptlify/aptly"
 	ctx "github.com/queeno/aptlify/context"
 	"github.com/queeno/aptlify/utils"
+	"github.com/smira/commander"
 )
 
 func dump(cmd *commander.Command, args []string) error {

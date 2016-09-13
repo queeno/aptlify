@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/gonuts/commander"
 	"github.com/queeno/aptlify/action"
 	"github.com/queeno/aptlify/config"
+	"github.com/smira/commander"
 )
 
 func apply(cmd *commander.Command, args []string) error {

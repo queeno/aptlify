@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/gonuts/commander"
 	"github.com/queeno/aptlify/action"
+	"github.com/smira/commander"
 )
 
 func plan(cmd *commander.Command, args []string) error {
