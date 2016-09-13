@@ -1,7 +1,7 @@
 package action
 
 import (
-  "github.com/queeno/aptlify/gpg"
+	"github.com/queeno/aptlify/gpg"
 )
 
 func createGpgActions(configGpgs gpg.AptlyGpgStruct, stateGpgs gpg.AptlyGpgStruct) []ActionStruct {
@@ -16,11 +16,10 @@ func createGpgActions(configGpgs gpg.AptlyGpgStruct, stateGpgs gpg.AptlyGpgStruc
 
 }
 
-func compareGpg (a gpg.AptlyGpgStruct, b string) ActionStruct {
+func compareGpg(a gpg.AptlyGpgStruct, b string) ActionStruct {
 
-	var ac = ActionStruct{ResourceName: b, ChangeType: Gpg_add, ResourceType: gpgType }
+	var ac = ActionStruct{ResourceName: b, ChangeType: GpgAdd, ResourceType: gpgType}
 	ac.AddReasonToAction("GPG key not found")
-
 
 	for _, gpg := range a.Fingerprint {
 		if gpg == b {

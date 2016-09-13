@@ -1,9 +1,8 @@
 package action
 
 import (
-  "github.com/queeno/aptlify/repo"
+	"github.com/queeno/aptlify/repo"
 )
-
 
 func createRepoActions(configRepos []repo.AptlyRepoStruct, stateRepos []repo.AptlyRepoStruct) []ActionStruct {
 
@@ -17,12 +16,12 @@ func createRepoActions(configRepos []repo.AptlyRepoStruct, stateRepos []repo.Apt
 
 }
 
-func compareRepos (a repo.AptlyRepoStruct, b repo.AptlyRepoStruct) ActionStruct {
+func compareRepos(a repo.AptlyRepoStruct, b repo.AptlyRepoStruct) ActionStruct {
 
-	var ac = ActionStruct{ResourceName: a.Name, ChangeType: Noop, ResourceType: repoType }
+	var ac = ActionStruct{ResourceName: a.Name, ChangeType: Noop, ResourceType: repoType}
 
 	if a.Name != b.Name {
-		ac.ChangeType = Repo_create
+		ac.ChangeType = RepoCreate
 		ac.ResourceType = repoType
 		ac.AddReasonToAction("new repo")
 	}

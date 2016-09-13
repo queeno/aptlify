@@ -12,20 +12,20 @@ type PrintSuite struct{}
 var _ = Suite(&PrintSuite{})
 
 func ExamplePrintEmptySlice() {
-	test_string_array := []string{}
-	PrintSlice(test_string_array)
+	testStringArray := []string{}
+	PrintSlice(testStringArray)
 	// Output:
 }
 
 func ExamplePrintSliceLengthOne() {
-	test_string_array := []string{"hello"}
-	PrintSlice(test_string_array)
+	testStringArray := []string{"hello"}
+	PrintSlice(testStringArray)
 	// Output: - hello
 }
 
 func ExamplePrintSliceLengthTwo() {
-	test_string_array := []string{"hello", "world"}
-	PrintSlice(test_string_array)
+	testStringArray := []string{"hello", "world"}
+	PrintSlice(testStringArray)
 	// Output:   - hello
 	//   - world
 }

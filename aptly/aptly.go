@@ -7,15 +7,15 @@ import (
 
 type Aptly interface {
 	// mirror_create: IN: mirror struct OUT: error
-	Mirror_create(mirror.AptlyMirrorStruct) ([]string, error)
+	MirrorCreate(mirror.AptlyMirrorStruct) ([]string, error)
 	// mirror_list: IN: n/a OUT: mirror-list, error
-	Mirror_list() ([]string, error)
+	MirrorList() ([]string, error)
 	// mirror_update: IN: mirror-name OUT: error
-	Mirror_update(string) ([]string, error)
+	MirrorUpdate(string) ([]string, error)
 	// repo_list: IN: n/a OUT: repo-list, error
-	Repo_list() ([]string, error)
+	RepoList() ([]string, error)
 	// repo_add: IN: repo-name, OUT: error
-	Repo_create(string) ([]string, error)
+	RepoCreate(string) ([]string, error)
 	// snapshot_create: IN: res ResourceStruct OUT: []string, error, string
 	SnapshotCreate(snapshot.ResourceStruct) ([]string, error, string)
 	// snapshot_filter: IN: ResourceStruct, string OUT: []string, error, string

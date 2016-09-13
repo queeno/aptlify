@@ -1,25 +1,25 @@
 package config
 
 import (
+	"encoding/json"
+	"github.com/queeno/aptlify/gpg"
 	"github.com/queeno/aptlify/mirror"
 	"github.com/queeno/aptlify/repo"
-	"github.com/queeno/aptlify/gpg"
 	"github.com/queeno/aptlify/snapshot"
-	"encoding/json"
 	"os"
 )
 
 type ConfigStruct struct {
-	Mirrors 	[]mirror.AptlyMirrorStruct			`json:"mirrors"`
-	Repos   	[]repo.AptlyRepoStruct					`json:"repos"`
-	Gpg_keys	gpg.AptlyGpgStruct							`json:"gpg_keys"`
-	Snapshots []snapshot.AptlySnapshotStruct	`json:"snapshots"`
+	Mirrors   []mirror.AptlyMirrorStruct     `json:"mirrors"`
+	Repos     []repo.AptlyRepoStruct         `json:"repos"`
+	GpgKeys   gpg.AptlyGpgStruct             `json:"gpg_keys"`
+	Snapshots []snapshot.AptlySnapshotStruct `json:"snapshots"`
 }
 
 var Config ConfigStruct = ConfigStruct{}
 var State ConfigStruct = ConfigStruct{}
 
-func (c *ConfigStruct) AddSnapshot(s snapshot.AptlySnapshotStruct){
+func (c *ConfigStruct) AddSnapshot(s snapshot.AptlySnapshotStruct) {
 
 	if s.IsEmpty() {
 		return
@@ -46,14 +46,13 @@ func (c *ConfigStruct) AddRepo(r repo.AptlyRepoStruct) {
 	c.Repos = append(c.Repos, r)
 }
 
-
 func (c *ConfigStruct) AddGpg(g string) {
 
 	if g == "" {
 		return
 	}
 
-	c.Gpg_keys.Fingerprint = append(c.Gpg_keys.Fingerprint, g)
+	c.GpgKeys.Fingerprint = append(c.GpgKeys.Fingerprint, g)
 }
 
 // Open configuration file and decode the JSON

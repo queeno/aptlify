@@ -8,18 +8,17 @@ import (
 
 func mirror(cmd *commander.Command, args []string) error {
 
-	var new_state config.ConfigStruct = config.ConfigStruct{}
+	var newState config.ConfigStruct = config.ConfigStruct{}
 
 	mirrors := context.State().Mirrors
 	actions := action.UpdateMirrors(mirrors)
 
 	for _, action := range actions {
-		action.Apply(context.State(), &new_state)
+		action.Apply(context.State(), &newState)
 	}
 
 	return nil
 }
-
 
 func makeCmdMirror() *commander.Command {
 	return &commander.Command{

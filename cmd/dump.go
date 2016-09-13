@@ -14,23 +14,23 @@ func dump(cmd *commander.Command, args []string) error {
 
 	a := &aptly.AptlyCli{}
 
-	mirror_list, err := a.Mirror_list()
+	mirrorList, err := a.MirrorList()
 	if err != nil {
 		return err
 	}
 
 	ctx.Logging.Info.Println("mirror information successfully retrieved")
 	fmt.Println("Mirrors:")
-	utils.PrintSlice(mirror_list)
+	utils.PrintSlice(mirrorList)
 
-	repo_list, err := a.Repo_list()
+	repoList, err := a.RepoList()
 	if err != nil {
 		return err
 	}
 
 	ctx.Logging.Info.Println("repo information successfully retrieved")
 	fmt.Println("Repos:")
-	utils.PrintSlice(repo_list)
+	utils.PrintSlice(repoList)
 
 	return nil
 }

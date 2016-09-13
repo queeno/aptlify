@@ -9,8 +9,8 @@ import (
 )
 
 type AptlifyContext struct {
-	config_loaded bool
-	state_loaded bool
+	configLoaded bool
+	stateLoaded  bool
 }
 
 var Logging = utils.NewLogging()
@@ -19,15 +19,15 @@ var Logging = utils.NewLogging()
 func NewContext() (*AptlifyContext, error) {
 
 	context := &AptlifyContext{
-		config_loaded: false,
-		state_loaded: false,
+		configLoaded: false,
+		stateLoaded:  false,
 	}
 
 	return context, nil
 
 }
 
-// Shutsdown the context
+// Shuts down the context
 
 func ShutdownContext() error {
 	return nil
@@ -53,14 +53,14 @@ func (context *AptlifyContext) WriteState(state config.ConfigStruct) {
 
 func (context *AptlifyContext) State() *config.ConfigStruct {
 
-	if context.state_loaded {
+	if context.stateLoaded {
 		return &config.State
 	}
 
 	var err error
 
 	filePath, err := filepath.Abs(filepath.Dir(os.Args[0]))
-  filePath = filepath.Join(filePath, "aptlify.state")
+	filePath = filepath.Join(filePath, "aptlify.state")
 	if err != nil {
 		Logging.Fatal.Fatalf(fmt.Sprintf("error loading current path: %s, %s", filePath, err))
 	}
@@ -70,7 +70,7 @@ func (context *AptlifyContext) State() *config.ConfigStruct {
 		Logging.Fatal.Fatalf(fmt.Sprintf("error loading state file %s, %s", filePath, err))
 	}
 
-	context.state_loaded = true
+	context.stateLoaded = true
 
 	return &config.State
 
@@ -79,7 +79,7 @@ func (context *AptlifyContext) State() *config.ConfigStruct {
 // Load configuration and inject it into context
 func (context *AptlifyContext) Config() *config.ConfigStruct {
 
-	if context.config_loaded {
+	if context.configLoaded {
 		return &config.Config
 	}
 
@@ -104,7 +104,7 @@ func (context *AptlifyContext) Config() *config.ConfigStruct {
 		Logging.Fatal.Fatalf(fmt.Sprintf("File not found!"))
 	}
 
-	context.config_loaded = true
+	context.configLoaded = true
 
 	return &config.Config
 

@@ -25,38 +25,38 @@ var timestamp = realTimestamp
 
 func cleanSlice(slice []string) []string {
 
-	var clean_slice []string
+	var cleanSlice []string
 
 	for _, elem := range slice {
 		if elem != "" {
-			clean_slice = append(clean_slice, elem)
+			cleanSlice = append(cleanSlice, elem)
 		}
 	}
-	return clean_slice
+	return cleanSlice
 }
 
-func (a *AptlyCli) Gpg_add(gpg_key string) ([]string, error) {
+func (a *AptlyCli) GpgAdd(gpg_key string) ([]string, error) {
 
 	out, err := execExec("gpg", "--no-default-keyring", "--keyring", "trustedkeys.gpg", "--keyserver", "keys.gnupg.net", "--recv-keys", gpg_key)
 	return out, err
 }
 
-func (a *AptlyCli) Mirror_list() ([]string, error) {
+func (a *AptlyCli) MirrorList() ([]string, error) {
 
 	mirrors, err := execExec(aptlyCmd, "mirror", "list", "-raw")
 	return mirrors, err
 }
 
-func (a *AptlyCli) Mirror_update(mirrorName string) ([]string, error) {
+func (a *AptlyCli) MirrorUpdate(mirrorName string) ([]string, error) {
 	out, err := execExec(aptlyCmd, "mirror", "update", mirrorName)
 	return out, err
 }
 
-// mirror_create: IN: mirror AptlyMirrorStruct, OUT: []string, error
-func (a *AptlyCli) Mirror_create(mirror mirror.AptlyMirrorStruct) ([]string, error) {
+// mirrorCreate: IN: mirror AptlyMirrorStruct, OUT: []string, error
+func (a *AptlyCli) MirrorCreate(mirror mirror.AptlyMirrorStruct) ([]string, error) {
 
-	filter_with_deps_cmd := ""
-	filter_cmd := ""
+	filterWithDepsCmd := ""
+	filterCmd := ""
 
 	if utils.IsStringEmpty(mirror.Name) {
 		return nil, fmt.Errorf("Missing name from mirror")
@@ -74,23 +74,23 @@ func (a *AptlyCli) Mirror_create(mirror mirror.AptlyMirrorStruct) ([]string, err
 	}
 
 	if mirror.Filter != nil {
-		var filter_cmds []string
+		var filterCmds []string
 		for _, filter := range mirror.Filter {
-			filter_cmds = append(filter_cmds, createAptlyMirrorFilterCommand(filter))
+			filterCmds = append(filterCmds, createAptlyMirrorFilterCommand(filter))
 		}
 
-		if len(filter_cmds) > 1 {
-			filter_cmd = fmt.Sprintf("-filter=%s", strings.Join(filter_cmds, " | "))
-		} else if len(filter_cmds) == 1 {
-			filter_cmd = fmt.Sprintf("-filter=%s", filter_cmds[0])
+		if len(filterCmds) > 1 {
+			filterCmd = fmt.Sprintf("-filter=%s", strings.Join(filterCmds, " | "))
+		} else if len(filterCmds) == 1 {
+			filterCmd = fmt.Sprintf("-filter=%s", filterCmds[0])
 		}
 	}
 
 	if mirror.FilterDeps {
-		filter_with_deps_cmd = "-filter-with-deps"
+		filterWithDepsCmd = "-filter-with-deps"
 	}
 
-	args := []string{"mirror", "create", filter_cmd, filter_with_deps_cmd, mirror.Name, mirror.Url, mirror.Dist, component}
+	args := []string{"mirror", "create", filterCmd, filterWithDepsCmd, mirror.Name, mirror.Url, mirror.Dist, component}
 	args = cleanSlice(args)
 
 	out, err := execExec(aptlyCmd, args...)
@@ -98,17 +98,17 @@ func (a *AptlyCli) Mirror_create(mirror mirror.AptlyMirrorStruct) ([]string, err
 	return out, err
 }
 
-func (a *AptlyCli) Repo_list() ([]string, error) {
+func (a *AptlyCli) RepoList() ([]string, error) {
 	repos, err := execExec(aptlyCmd, "repo", "list", "-raw")
 	return repos, err
 }
 
-func (a *AptlyCli) Mirror_drop(mirrorName string) ([]string, error) {
+func (a *AptlyCli) MirrorDrop(mirrorName string) ([]string, error) {
 	out, err := execExec(aptlyCmd, "mirror", "drop", mirrorName)
 	return out, err
 }
 
-func (a *AptlyCli) Repo_create(repoName string) ([]string, error) {
+func (a *AptlyCli) RepoCreate(repoName string) ([]string, error) {
 	out, err := execExec(aptlyCmd, "repo", "create", repoName)
 	return out, err
 }
@@ -175,15 +175,15 @@ func createAptlyMirrorFilterCommand(filter mirror.AptlyFilterStruct) string {
 		f = append(f, fmt.Sprintf("$Version (= %s )", filter.Version))
 	}
 
-	f_str := ""
+	fStr := ""
 
 	if len(f) > 1 {
-		f_str = fmt.Sprintf("( %s )", strings.Join(f, " , "))
+		fStr = fmt.Sprintf("( %s )", strings.Join(f, " , "))
 	} else if len(f) == 1 {
-		f_str = fmt.Sprintf("( %s )", f[0])
+		fStr = fmt.Sprintf("( %s )", f[0])
 	}
 
-	return f_str
+	return fStr
 
 }
 

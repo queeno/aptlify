@@ -24,7 +24,7 @@ func (s *AptlyCliSuite) TestGpgAddSuccess(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	outstring, err := a.Gpg_add(testGpgKey)
+	outstring, err := a.GpgAdd(testGpgKey)
 	c.Check(outstring[0], Equals, "gpg: requesting key 9C7DE460 from hkp server keys.gnupg.net")
 	c.Check(err, Equals, nil)
 }
@@ -35,7 +35,7 @@ func (s *AptlyCliSuite) TestGpgAddFailure(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	outstring, err := a.Gpg_add(testGpgKey)
+	outstring, err := a.GpgAdd(testGpgKey)
 	c.Check(outstring[0], Equals, "gpg: requesting key FAKE from hkp server keys.gnupg.net")
 	c.Check(err, ErrorMatches, "exit status 2")
 }
@@ -45,7 +45,7 @@ func (s *AptlyCliSuite) TestMirrorDropSuccess(c *C) {
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
 	testData := "test_mirror"
-	outstring, err := a.Mirror_drop(testData)
+	outstring, err := a.MirrorDrop(testData)
 	c.Check(outstring[0], Equals, "Mirror `test_mirror` has been removed.")
 	c.Check(err, Equals, nil)
 }
@@ -56,7 +56,7 @@ func (s *AptlyCliSuite) TestRepoCreateSuccess(c *C) {
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
 	testData := "test_repo"
-	outstring, err := a.Repo_create(testData)
+	outstring, err := a.RepoCreate(testData)
 	c.Check(outstring[2], Equals, "Local repo [test_repo] successfully added.")
 	c.Check(err, Equals, nil)
 }
@@ -66,7 +66,7 @@ func (s *AptlyCliSuite) TestRepoListSuccess(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	outstring, err := a.Repo_list()
+	outstring, err := a.RepoList()
 	c.Check(outstring[0], Equals, "some_mirror")
 	c.Check(err, Equals, nil)
 }
@@ -76,7 +76,7 @@ func (s *AptlyCliSuite) TestMirrorListSuccess(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	outstring, err := a.Mirror_list()
+	outstring, err := a.MirrorList()
 	c.Check(outstring[0], Equals, "some_mirror")
 	c.Check(err, Equals, nil)
 }
@@ -87,7 +87,7 @@ func (s *AptlyCliSuite) TestMirrorUpdateSuccess(c *C) {
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
 	testMirror := "working_mirror"
-	outstring, err := a.Mirror_update(testMirror)
+	outstring, err := a.MirrorUpdate(testMirror)
 	c.Check(outstring[0], Equals, "Mirror `working_mirror` has been successfully updated.")
 	c.Check(err, Equals, nil)
 }
@@ -98,7 +98,7 @@ func (s *AptlyCliSuite) TestMirrorUpdateFailure(c *C) {
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
 	testMirror := "test_mirror_no_exist"
-	outstring, err := a.Mirror_update(testMirror)
+	outstring, err := a.MirrorUpdate(testMirror)
 	c.Check(outstring[0], Equals, "ERROR: unable to update: mirror with name test_mirror_no_exist not found")
 	c.Check(err, ErrorMatches, "exit status 1")
 }
@@ -114,7 +114,7 @@ func (s *AptlyCliSuite) TestMirrorCreateNofilter(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	outstring, err := a.Mirror_create(testData)
+	outstring, err := a.MirrorCreate(testData)
 	c.Check(outstring[4], Equals, "Mirror [test_mirror]: http://example.com test_dist successfully added.")
 	c.Check(err, Equals, nil)
 }
@@ -135,7 +135,7 @@ func (s *AptlyCliSuite) TestMirrorCreateSinglefilter(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	outstring, err := a.Mirror_create(testData)
+	outstring, err := a.MirrorCreate(testData)
 	c.Check(outstring[4], Equals, "Mirror [test_mirror]: http://example.com test_dist successfully added.")
 	c.Check(err, Equals, nil)
 }
@@ -161,7 +161,7 @@ func (s *AptlyCliSuite) TestMirrorCreateMultifilter(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	outstring, err := a.Mirror_create(testData)
+	outstring, err := a.MirrorCreate(testData)
 	c.Check(outstring[4], Equals, "Mirror [test_mirror]: http://example.com test_dist successfully added.")
 	c.Check(err, Equals, nil)
 }
@@ -176,7 +176,7 @@ func (s *AptlyCliSuite) TestMirrorCreateMissingName(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	_, err := a.Mirror_create(testData)
+	_, err := a.MirrorCreate(testData)
 	c.Check(err, ErrorMatches, "Missing name from mirror")
 }
 func (s *AptlyCliSuite) TestMirrorCreateMissingUrl(c *C) {
@@ -189,7 +189,7 @@ func (s *AptlyCliSuite) TestMirrorCreateMissingUrl(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	_, err := a.Mirror_create(testData)
+	_, err := a.MirrorCreate(testData)
 	c.Check(err, ErrorMatches, "Missing url from mirror")
 }
 func (s *AptlyCliSuite) TestMirrorCreateMissingDist(c *C) {
@@ -202,7 +202,7 @@ func (s *AptlyCliSuite) TestMirrorCreateMissingDist(c *C) {
 	//Fake exec
 	execExec = fakeExecExec
 	defer func() { execExec = exec.Exec }()
-	_, err := a.Mirror_create(testData)
+	_, err := a.MirrorCreate(testData)
 	c.Check(err, ErrorMatches, "Missing distribution from mirror")
 }
 func (s *AptlyCliSuite) TestCreateAptlyMirrorFilterCommand(c *C) {
@@ -293,34 +293,34 @@ func (s *AptlyCliSuite) TestSnapShotMergeSuccess(c *C) {
 }
 
 func (s *AptlyCliSuite) TestCleanSlice(c *C) {
-	str_a := []string{"a", "b", "c", "d"}
-	str_b := []string{"a", " ", "c", ""}
-	str_c := []string{"", "b", "c", "d"}
-	str_d := []string{" ", "b", "c", "d"}
-	str_e := []string{" ", "", "", ""}
-	str_f := []string{"", "", "", ""}
-	test_a := cleanSlice(str_a)
-	test_b := cleanSlice(str_b)
-	test_c := cleanSlice(str_c)
-	test_d := cleanSlice(str_d)
-	test_e := cleanSlice(str_e)
-	test_f := cleanSlice(str_f)
-	c.Assert(test_a[0], Equals, str_a[0])
-	c.Assert(test_a[1], Equals, str_a[1])
-	c.Assert(test_a[2], Equals, str_a[2])
-	c.Assert(test_a[3], Equals, str_a[3])
-	c.Assert(test_b[0], Equals, "a")
-	c.Assert(test_b[1], Equals, " ")
-	c.Assert(test_b[2], Equals, "c")
-	c.Assert(test_c[0], Equals, "b")
-	c.Assert(test_c[1], Equals, "c")
-	c.Assert(test_c[2], Equals, "d")
-	c.Assert(test_d[0], Equals, " ")
-	c.Assert(test_d[1], Equals, "b")
-	c.Assert(test_d[2], Equals, "c")
-	c.Assert(test_d[3], Equals, "d")
-	c.Assert(test_e[0], Equals, " ")
-	c.Assert(len(test_f), Equals, 0)
+	strA := []string{"a", "b", "c", "d"}
+	strB := []string{"a", " ", "c", ""}
+	strC := []string{"", "b", "c", "d"}
+	strD := []string{" ", "b", "c", "d"}
+	strE := []string{" ", "", "", ""}
+	strF := []string{"", "", "", ""}
+	testA := cleanSlice(strA)
+	testB := cleanSlice(strB)
+	testC := cleanSlice(strC)
+	testD := cleanSlice(strD)
+	testE := cleanSlice(strE)
+	testF := cleanSlice(strF)
+	c.Assert(testA[0], Equals, strA[0])
+	c.Assert(testA[1], Equals, strA[1])
+	c.Assert(testA[2], Equals, strA[2])
+	c.Assert(testA[3], Equals, strA[3])
+	c.Assert(testB[0], Equals, "a")
+	c.Assert(testB[1], Equals, " ")
+	c.Assert(testB[2], Equals, "c")
+	c.Assert(testC[0], Equals, "b")
+	c.Assert(testC[1], Equals, "c")
+	c.Assert(testC[2], Equals, "d")
+	c.Assert(testD[0], Equals, " ")
+	c.Assert(testD[1], Equals, "b")
+	c.Assert(testD[2], Equals, "c")
+	c.Assert(testD[3], Equals, "d")
+	c.Assert(testE[0], Equals, " ")
+	c.Assert(len(testF), Equals, 0)
 }
 func (s *AptlyCliSuite) TestSnapShotMergeFailure(c *C) {
 	a := AptlyCli{}

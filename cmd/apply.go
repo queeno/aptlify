@@ -8,15 +8,15 @@ import (
 
 func apply(cmd *commander.Command, args []string) error {
 
-	var new_state config.ConfigStruct = config.ConfigStruct{}
+	var newState config.ConfigStruct = config.ConfigStruct{}
 
 	actions := action.CreateActions(context.Config(), context.State())
 
 	for _, action := range actions {
-		action.Apply(context.Config(), &new_state)
+		action.Apply(context.Config(), &newState)
 	}
 
-	context.WriteState(new_state)
+	context.WriteState(newState)
 
 	return nil
 }

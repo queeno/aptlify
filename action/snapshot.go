@@ -25,7 +25,7 @@ func createSnapshotActions(configSnapshots []snapshot.AptlySnapshotStruct, state
 func updateSnapshot(a snapshot.AptlySnapshotStruct, revision int) ActionStruct {
 
 	var ac = ActionStruct{ResourceName: a.Name,
-		ChangeType:       Snapshot_update,
+		ChangeType:       SnapshotUpdate,
 		ResourceType:     snapshotType,
 		SnapshotRevision: revision + 1}
 
