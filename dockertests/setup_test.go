@@ -13,11 +13,11 @@ var id string
 func TestMain(m *testing.M) {
 
 	dockerutils.StartAptlifyDocker(&client, &id)
+	dockerutils.CompileAptlify(client, id)
 
 	exitCode := m.Run()
 
 	dockerutils.StopAptlifyDocker(client, id)
-
 	os.Exit(exitCode)
 
 }

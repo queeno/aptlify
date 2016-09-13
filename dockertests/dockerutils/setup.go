@@ -2,6 +2,7 @@ package dockerutils
 
 import (
 	docker "github.com/fsouza/go-dockerclient"
+	"path/filepath"
 	"fmt"
 	"os"
 )
@@ -11,32 +12,28 @@ import (
 
 func createHostOptions() *docker.HostConfig {
 
-	basePath, _ := os.Getwd()
-
-	volumes := []string{
-			basePath, "/root/gowork/src/github.com/queeno/aptlify",
-	}
+  currentPath, _ := os.Getwd()
+	basePath := filepath.Dir(currentPath)
+	aptlifyBind := fmt.Sprintf("%s:/root/gowork/src/github.com/queeno/aptlify:rw", basePath)
 
 	hostConfig := &docker.HostConfig{
-		Binds:			volumes,
+		Binds:			[]string{aptlifyBind},
 		AutoRemove:	true,
+		Privileged: false,
 	}
 
 	return hostConfig
 
 }
 
-func createImageOptions() docker.CreateContainerOptions {
+func createImageOptions() *docker.Config {
 
-	image := "aptlify"
-
-  opts := docker.CreateContainerOptions{
-      Config: &docker.Config{
-          Image:        image,
-      },
+  imageConfig := &docker.Config{
+          Image:        "aptlify",
+					WorkingDir:		"/aptlify",
   }
 
-    return opts
+	return imageConfig
 }
 
 func StartAptlifyDocker(dockClient **docker.Client, dockId *string) {
@@ -48,7 +45,13 @@ func StartAptlifyDocker(dockClient **docker.Client, dockId *string) {
 		panic(fmt.Sprintf("Cannot connect to Docker daemon: %s", err))
 	}
 
-	container, err := client.CreateContainer(createImageOptions())
+	createContOps := docker.CreateContainerOptions{
+			 Name:       "aptlify",
+			 Config:     createImageOptions(),
+			 HostConfig: createHostOptions(),
+	 }
+
+	container, err := client.CreateContainer(createContOps)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot create Docker container: %s", err))
 	}
