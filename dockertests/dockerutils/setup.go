@@ -39,7 +39,7 @@ func createImageOptions() docker.CreateContainerOptions {
     return opts
 }
 
-func StartAptlifyDocker() (*docker.Client, string){
+func StartAptlifyDocker(dockClient **docker.Client, dockId *string) {
 
 	var err error
 
@@ -58,5 +58,18 @@ func StartAptlifyDocker() (*docker.Client, string){
 		panic(fmt.Sprintf("Cannot start Docker container: %s", err))
 	}
 
-	return client, container.ID
+	*dockClient = client
+	*dockId = container.ID
+
+}
+
+func StopAptlifyDocker(dockClient *docker.Client, dockId string) {
+
+	if err := dockClient.RemoveContainer(docker.RemoveContainerOptions{
+		ID:    dockId,
+		Force: true,
+	}); err != nil {
+		panic(fmt.Sprintf("cannot remove container: %s", err))
+	}
+
 }

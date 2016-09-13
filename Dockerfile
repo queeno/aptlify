@@ -13,3 +13,7 @@ RUN echo "deb http://repo.aptly.info/ squeeze main" >> /etc/apt/sources.list.d/a
 
 ENV GOPATH /root/gowork
 ENV PATH /root/gowork/bin:/usr/bin:/usr/local/bin:/bin:/sbin:/usr/sbin
+
+ADD start-docker.sh /start-docker.sh
+
+CMD ["/start-docker.sh"]

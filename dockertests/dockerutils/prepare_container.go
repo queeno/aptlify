@@ -9,7 +9,7 @@ import (
 // Prepare container for next test
 //-------------------------------------------------------------
 
-func prepareContainer(containerID string, c *docker.Client) error {
+func PrepareContainer(c *docker.Client, containerID string) error {
 
 	runCommand(containerID, c, "echo", "Hello", "World")
 	return nil
