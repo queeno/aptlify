@@ -34,13 +34,15 @@ func runCommand(containerID string, c *docker.Client, cmd ...string) (string, st
 	opts := docker.StartExecOptions{
 			OutputStream: &stdout,
 			ErrorStream:  &stderr,
-//			InputStream:  reader,
 			RawTerminal:  true,
 	}
 
 	if err = c.StartExec(exec.ID, opts); err != nil {
 		panic(fmt.Sprintf("Error running command in docker container: %s", err))
 	}
-
+	fmt.Println("STDIN:")
+	fmt.Println(stdout.String())
+	fmt.Println("STDERR:")
+	fmt.Println(stderr.String())
 	return stdout.String(), stderr.String()
 }

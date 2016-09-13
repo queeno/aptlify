@@ -7,12 +7,17 @@ import (
 	docker "github.com/fsouza/go-dockerclient"
 )
 
-var container *docker.Container
+var client *docker.Client
+var id string
 
 func TestMain(m *testing.M) {
 
-	dockerutils.StartAptlifyDocker()
+	dockerutils.StartAptlifyDocker(&client, &id)
+
 	exitCode := m.Run()
+
+	dockerutils.StopAptlifyDocker(client, id)
+
 	os.Exit(exitCode)
 
 }
