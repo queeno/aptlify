@@ -4,13 +4,13 @@ import (
 	docker "github.com/fsouza/go-dockerclient"
 )
 
-
-
 // Prepare container for next test
 //-------------------------------------------------------------
 
-func PrepareContainer(c *docker.Client, containerID string) error {
+func PrepareContainer(c *docker.Client, containerID string) {
 
-	runCommand(containerID, c, "echo", "Hello", "World")
-	return nil
+	// Clean up aptly
+	var removeAptlyContainer = []string{"rm", "-rf", "/root/.aptly"}
+	runCommand(containerID, c, removeAptlyContainer...)
+
 }
