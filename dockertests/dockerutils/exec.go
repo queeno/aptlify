@@ -21,7 +21,7 @@ func RunCommand(c *docker.Client, containerID string, cmd ...string) (string, st
 		Cmd:          cmd,
 		Container:    containerID,
 	}
-	fmt.Sprintf("derp")
+
 	var exec *docker.Exec
 
 	if exec, err = c.CreateExec(de); err != nil {
