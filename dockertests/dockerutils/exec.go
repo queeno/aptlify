@@ -33,7 +33,7 @@ func RunCommand(c *docker.Client, containerID string, cmd ...string) (string, st
 	opts := docker.StartExecOptions{
 		OutputStream: &stdout,
 		ErrorStream:  &stderr,
-		RawTerminal:  true,
+		RawTerminal:  false,
 	}
 
 	if err = c.StartExec(exec.ID, opts); err != nil {

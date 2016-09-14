@@ -22,7 +22,7 @@ func (s *DockerTestsSuite) TestEmptyConfigFile(c *C) {
 	dockerutils.RunCommand(client, id, testExecuteCommand...)
 	testFetchOutput := []string{"bash", "-c", "cat aptlify.state"}
 	stdout, _ := dockerutils.RunCommand(client, id, testFetchOutput...)
-	c.Check(stdout, Equals, "\x01\x00\x00\x00\x00\x00\x00h{\n  \"mirrors\": null,\n  \"repos\": null,\n  \"gpg_keys\": {\n    \"fingerprint\": null\n  },\n  \"snapshots\": null\n}")
+	c.Check(stdout, Equals, "{\n  \"mirrors\": null,\n  \"repos\": null,\n  \"gpg_keys\": {\n    \"fingerprint\": null\n  },\n  \"snapshots\": null\n}")
 }
 
 func (s *DockerTestsSuite) TestBaseConfigFile(c *C) {
@@ -31,7 +31,7 @@ func (s *DockerTestsSuite) TestBaseConfigFile(c *C) {
 	dockerutils.RunCommand(client, id, testExecuteCommand...)
 	testFetchOutput := []string{"bash", "-c", "cat aptlify.state"}
 	stdout, _ := dockerutils.RunCommand(client, id, testFetchOutput...)
-	c.Check(stdout, Equals, "\x01\x00\x00\x00\x00\x00\x03W{\n"+
+	c.Check(stdout, Equals, "{\n"+
 		"  \"mirrors\": [\n"+
 		"    {\n"+
 		"      \"name\": \"devenvironment-aptly\",\n"+
@@ -91,7 +91,7 @@ func (s *DockerTestsSuite) TestConfigMigration(c *C) {
 	testFetchOutput := []string{"bash", "-c", "cat aptlify.state"}
 	stdout, _ := dockerutils.RunCommand(client, id, testFetchOutput...)
 	c.Check(stdout, Equals, ""+
-		"\x01\x00\x00\x00\x00\x00\x03V{\n"+
+		"{\n"+
 		"  \"mirrors\": [\n"+
 		"    {\n"+
 		"      \"name\": \"devenvironment-aptly\",\n"+
@@ -143,10 +143,10 @@ func (s *DockerTestsSuite) TestConfigMigration(c *C) {
 func (s *DockerTestsSuite) TestAptlifyPlan(c *C) {
 	dockerutils.PrepareContainer(client, id)
 	//Apply base configuration
-	testExecuteCommand := []string{"bash", "-c", "./aptlify plan -config dockertests/data/TestBaseConfigFile.json"}
+	testExecuteCommand := []string{"bash", "-c", "./aptlify plan -config dockertests/data/TestBaseConfigFile.json | cat"}
 	stdout, _ := dockerutils.RunCommand(client, id, testExecuteCommand...)
 	c.Check(stdout, Equals, ""+
-		"\x01\x00\x00\x00\x00\x00\x022+gpg key 9E3E53F19C7DE460 will be added. Reason: GPG key not found\n"+
+		"+gpg key 9E3E53F19C7DE460 will be added. Reason: GPG key not found\n"+
 		"+gpg key 353525F9 will be added. Reason: GPG key not found\n"+
 		"+gpg key 505D97A41C61B9CD will be added. Reason: GPG key not found\n"+
 		"+gpg key 1C61B9CD will be added. Reason: GPG key not found\n"+
@@ -155,16 +155,30 @@ func (s *DockerTestsSuite) TestAptlifyPlan(c *C) {
 		"+repo devenvironment-internal will be created. Reason: new repo\n"+
 		"+repo test will be created. Reason: new repo\n"+
 		"+snapshot devenvironment will be updated at revision 00001. Reason: update_snapshot\n")
-	testExecuteCommand = []string{"bash", "-c", "./aptlify apply -config dockertests/data/TestBaseConfigFile.json"}
+	testExecuteCommand = []string{"bash", "-c", "./aptlify apply -config dockertests/data/TestBaseConfigFile.json | cat"}
 	stdout, _ = dockerutils.RunCommand(client, id, testExecuteCommand...)
 	c.Check(stdout, Equals, ""+
-		"\x01\x00\x00\x00\x00\x00\x00(gpg 9E3E53F19C7DE460 creation succeeded\n"+
-		"\x01\x00\x00\x00\x00\x00\x00 gpg 353525F9 creation succeeded\n"+
-		"\x01\x00\x00\x00\x00\x00\x00(gpg 505D97A41C61B9CD creation succeeded\n"+
-		"\x01\x00\x00\x00\x00\x00\x00 gpg 1C61B9CD creation succeeded\n"+
-		"\x01\x00\x00\x00\x00\x00\x00-mirror devenvironment-aptly create succeeded\n"+
-		"\x01\x00\x00\x00\x00\x00\x00 mirror haproxy create succeeded\n"+
-		"\x01\x00\x00\x00\x00\x00\x000repo devenvironment-internal creation succeeded\n"+
-		"\x01\x00\x00\x00\x00\x00\x00\x1drepo test creation succeeded\n"+
-		"\x01\x00\x00\x00\x00\x00\x007combined snapshot created devenvironment at revision 1\n")
+		"gpg 9E3E53F19C7DE460 creation succeeded\n"+
+		"gpg 353525F9 creation succeeded\n"+
+		"gpg 505D97A41C61B9CD creation succeeded\n"+
+		"gpg 1C61B9CD creation succeeded\n"+
+		"mirror devenvironment-aptly create succeeded\n"+
+		"mirror haproxy create succeeded\n"+
+		"repo devenvironment-internal creation succeeded\n"+
+		"repo test creation succeeded\n"+
+		"combined snapshot created devenvironment at revision 1\n")
+}
+func (s *DockerTestsSuite) TestAptlyStateApply(c *C) {
+	dockerutils.PrepareContainer(client, id)
+	//Apply base configuration
+	testExecuteCommand := []string{"bash", "-c", "./aptlify apply -config dockertests/data/TestBaseConfigFile.json"}
+	dockerutils.RunCommand(client, id, testExecuteCommand...)
+	testFetchOutput := []string{"bash", "-c", "aptly mirror list | cat"}
+	stdout, _ := dockerutils.RunCommand(client, id, testFetchOutput...)
+	c.Check(stdout, Equals, ""+
+		"List of mirrors:\n"+
+		" * [devenvironment-aptly]: http://repo.aptly.info/ squeeze\n"+
+		" * [haproxy]: http://ppa.launchpad.net/vbernat/haproxy-1.5/ubuntu/ trusty\n"+
+		"\n"+
+		"To get more information about mirror, run `aptly mirror show <name>`.\n")
 }
