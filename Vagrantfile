@@ -7,7 +7,12 @@
 # you're doing.
 Vagrant.configure("2") do |config|
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "geerlingguy/ubuntu1604"
+  config.vm.provider "virtualbox" do |vb|
+    config.vm.box = "ubuntu/xenial64"
+  end
+  config.vm.provider "vmware" do
+    config.vm.box = "geerlingguy/ubuntu1604"
+  end
   config.vm.provision "shell", inline: <<-SHELL
   echo "deb http://repo.aptly.info/ squeeze main" >> /etc/apt/sources.list.d/aptly.list
   echo "deb http://ftp.uk.debian.org/debian/ stretch universe main" >> /etc/apt/sources.list.d/golang.list
