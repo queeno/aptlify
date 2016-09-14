@@ -95,9 +95,6 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, newState *config.ConfigSt
 		findSnapshot := snap.AptlySnapshotStruct{Name: a.ResourceName}
 		snapshot := findSnapshot.SearchSnapshotInAptlySnapshots(conf.Snapshots)
 
-		fmt.Println(snapshot.Name)
-		fmt.Println(fmt.Sprintf("Snapshot update has been passed revision: %05d", a.SnapshotRevision))
-
 		var interSnapshotNames []string
 		var tempSnapshotName string
 		var delSnapshotName string
