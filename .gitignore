@@ -3,3 +3,4 @@ vendor
 aptlify
 *.state
 .viminfo
+.vagrant
