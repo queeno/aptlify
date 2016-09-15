@@ -2,12 +2,13 @@ package aptly
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/queeno/aptlify/exec"
 	"github.com/queeno/aptlify/mirror"
 	"github.com/queeno/aptlify/snapshot"
 	"github.com/queeno/aptlify/utils"
-	"strings"
-	"time"
 )
 
 // Check interface
@@ -157,7 +158,7 @@ func (a *AptlyCli) SnapshotDrop(snapshotName string, force bool) ([]string, erro
 }
 
 func (a *AptlyCli) SnapshotMerge(combinedName string, inputSnapshotNames []string) ([]string, error) {
-	args := []string{"snapshot", "merge", combinedName}
+	args := []string{"snapshot", "merge", "-no-remove", combinedName}
 	args = append(args, inputSnapshotNames...)
 	return execExec(aptlyCmd, args...)
 }
