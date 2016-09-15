@@ -2,14 +2,15 @@ package aptly
 
 import (
 	"fmt"
-	"github.com/queeno/aptlify/exec"
-	"github.com/queeno/aptlify/mirror"
-	"github.com/queeno/aptlify/snapshot"
-	. "gopkg.in/check.v1"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/queeno/aptlify/exec"
+	"github.com/queeno/aptlify/mirror"
+	"github.com/queeno/aptlify/snapshot"
+	. "gopkg.in/check.v1"
 )
 
 func TestAptlyCli(t *testing.T) { TestingT(t) }
@@ -438,10 +439,10 @@ func fakeTimestamp() string {
 
 func TestHelperProcess(t *testing.T) {
 	testOutput := map[string]string{
-		fmt.Sprintf("%s snapshot merge testCombinedSnapshot input1 input2", aptlyCmd): `
+		fmt.Sprintf("%s snapshot merge -no-remove testCombinedSnapshot input1 input2", aptlyCmd): `
 Snapshot testCombinedSnapshot successfully created.
 You can run 'aptly publish snapshot testCombinedSnapshot' to publish snapshot as Debian repository.`,
-		fmt.Sprintf("%s snapshot merge testCombinedSnapshot input1 input_no_exist", aptlyCmd): `
+		fmt.Sprintf("%s snapshot merge -no-remove testCombinedSnapshot input1 input_no_exist", aptlyCmd): `
 ERROR: unable to load snapshot: snapshot with name input1 not found`,
 		fmt.Sprintf("%s snapshot create from mirror test_mirror", aptlyCmd): `
 Snapshot testCombinedSnapshot successfully created.
@@ -510,7 +511,7 @@ You can run 'aptly repo add test_repo ...' to add packages to repository.`,
 	testError := map[string]int{
 		"gpg --no-default-keyring --keyring trustedkeys.gpg --keyserver keys.gnupg.net --recv-keys FAKE":                                                                                     2,
 		fmt.Sprintf("%s mirror update test_mirror_no_exist", aptlyCmd):                                                                                                                       1,
-		fmt.Sprintf("%s snapshot merge testCombinedSnapshot input1 input_no_exist", aptlyCmd):                                                                                                1,
+		fmt.Sprintf("%s snapshot merge -no-remove testCombinedSnapshot input1 input_no_exist", aptlyCmd):                                                                                     1,
 		fmt.Sprintf("%s snapshot create test_mirror_fail_1970-01-01_00:00:00 from mirror test_mirror_fail", aptlyCmd):                                                                        1,
 		fmt.Sprintf("%s snapshot filter absenttestbase absenttestbase_filtered ", aptlyCmd):                                                                                                  1,
 		fmt.Sprintf("%s snapshot filter absenttestbase absenttestbase_filtered ( Name (= package ) , $Version (= 1.0.0 ) )", aptlyCmd):                                                       1,
