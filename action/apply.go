@@ -2,13 +2,14 @@ package action
 
 import (
 	"fmt"
+	"strings"
+
 	colour "github.com/fatih/color"
 	aptlylib "github.com/queeno/aptlify/aptly"
 	"github.com/queeno/aptlify/config"
 	"github.com/queeno/aptlify/mirror"
 	"github.com/queeno/aptlify/repo"
 	snap "github.com/queeno/aptlify/snapshot"
-	"strings"
 )
 
 var aptly = aptlylib.AptlyCli{}
@@ -101,35 +102,46 @@ func (a ActionStruct) Apply(conf *config.ConfigStruct, newState *config.ConfigSt
 		var combinedSnapshotName string
 		var out []string
 		var err error
+		skipSnapshot := false
 
 		for _, resource := range snapshot.Resources {
+
+			skipSnapshot = false
 
 			out, err, tempSnapshotName = aptly.SnapshotCreate(resource)
 			if err != nil {
 				msg := fmt.Sprintf("snapshot %s creation failed", tempSnapshotName)
 				colour.Red(msg)
-				fmt.Println(strings.Join(out, " "))
-				return
-			}
-
-			if resource.Filter != nil {
-				delSnapshotName = tempSnapshotName
-				out, err, tempSnapshotName = aptly.SnapshotFilter(resource, tempSnapshotName)
-				if err != nil {
-					msg := fmt.Sprintf("snapshot %s filter failed", tempSnapshotName)
-					colour.Red(msg)
-					fmt.Println(strings.Join(out, " "))
+				outmsg := strings.Join(out, " ")
+				fmt.Println(outmsg)
+				if outmsg != "ERROR: unable to create snapshot: local repo doesn't have packages" {
 					return
-				}
-				out, err = aptly.SnapshotDrop(delSnapshotName, true)
-				if err != nil {
-					msg := fmt.Sprintf("snapshot %s drop failed", delSnapshotName)
-					colour.Red(msg)
-					fmt.Println(strings.Join(out, " "))
+				} else {
+					fmt.Println("Continuing despite empty repo")
+					skipSnapshot = true
 				}
 			}
 
-			interSnapshotNames = append(interSnapshotNames, tempSnapshotName)
+			if !skipSnapshot {
+
+				if resource.Filter != nil {
+					delSnapshotName = tempSnapshotName
+					out, err, tempSnapshotName = aptly.SnapshotFilter(resource, tempSnapshotName)
+					if err != nil {
+						msg := fmt.Sprintf("snapshot %s filter failed", tempSnapshotName)
+						colour.Red(msg)
+						fmt.Println(strings.Join(out, " "))
+						return
+					}
+					out, err = aptly.SnapshotDrop(delSnapshotName, true)
+					if err != nil {
+						msg := fmt.Sprintf("snapshot %s drop failed", delSnapshotName)
+						colour.Red(msg)
+						fmt.Println(strings.Join(out, " "))
+					}
+				}
+				interSnapshotNames = append(interSnapshotNames, tempSnapshotName)
+			}
 		}
 
 		textRevision := fmt.Sprintf("%05d", a.SnapshotRevision)
