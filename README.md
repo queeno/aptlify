@@ -40,6 +40,11 @@ The file should include 4 sections: `gpg_keys`, `mirrors`, `repos`, `snapshots`
         - `name`: The name of the package to filter.
         - `version`: The version of the package to filter.
 
+### Build deb package
+
+* Install `fpm` (https://github.com/jordansissel/fpm)
+* Run `build.sh` with a version number (e.g. 1.0.0)
+
 ### Example `~/.aptlify.conf`
 
 ```

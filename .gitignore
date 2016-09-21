@@ -4,3 +4,4 @@ aptlify
 *.state
 .viminfo
 .vagrant
+*.deb
